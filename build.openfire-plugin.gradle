@@ -1,0 +1,230 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+import java.time.Duration
+import java.time.Instant
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://maven.atlassian.com/repository/public'
+    }
+    maven {
+        url 'https://igniterealtime.org/archiva/repository/maven/'
+    }
+}
+
+dependencies {
+    compileOnly "org.igniterealtime.openfire:xmppserver:${minOpenfireVersion}"
+    testImplementation "org.igniterealtime.openfire:xmppserver:${minOpenfireVersion}"
+}
+
+def canonicalName = project.name.replaceAll('\\W', '').toLowerCase()
+
+task confirmChangeLog() {
+    group = 'verification'
+    description = 'Checks the changelog contains the current date - but only if this is not a SNAPSHOT version'
+    def changelog = new File('src/plugin/changelog.html')
+    inputs.file(changelog)
+    def expectedDate = new Date().format("MMMM d, yyyy")
+    doFirst {
+        if (!changelog.text.contains(expectedDate)) {
+            throw new Exception("The changelog at ${changelog} does not contain todays date (${expectedDate}) - remember to update it!")
+        }
+    }
+}
+tasks.confirmChangeLog.onlyIf { !(project.version as String).contains("SNAPSHOT") }
+tasks.check.dependsOn tasks.confirmChangeLog
+
+task jspcLoggingProperties(type: WriteProperties) {
+    outputFile = file("$buildDir/jspc-log4j/log4j2.properties")
+    property('appender.console.type', 'Console')
+    property('appender.console.name', 'STDOUT')
+    property('appender.console.layout.type', 'PatternLayout')
+    property('appender.console.layout.pattern', '%m%n')
+}
+
+def jspCompile(File srcDir, File destDir, File mergedWebXml, String javaPackage) {
+    def xmlFragment = file("${destDir}/web.xml.fragment")
+    // Create the target WEB-INF folder so the JspC can create the web.xml.partial
+    xmlFragment.getParentFile().mkdirs()
+    javaexec {
+        classpath = files(sourceSets.main.compileClasspath, tasks.jspcLoggingProperties.outputFile.parent)
+        main = 'org.apache.jasper.JspC'
+        args = ['-webapp', srcDir.absolutePath,
+                '-d', file("${destDir}/java").absolutePath,
+                '-p', javaPackage,
+                '-failFast',
+                '-l',
+                '-die',
+                '-source', java.sourceCompatibility.toString(),
+                '-target', java.targetCompatibility.toString(),
+                '-webxmlencoding', 'UTF-8',
+                '-webinc', xmlFragment.absolutePath
+        ]
+    }
+    def webXmlOriginal = file("${srcDir}/WEB-INF/web.xml")
+    if (webXmlOriginal.exists() && xmlFragment.exists()) {
+        // Merge the partial XML with the original
+        String originalXML = webXmlOriginal.text
+        String xmlToMerge = xmlFragment.text
+        String mergedXML = originalXML.replaceFirst('(?s)(<web-app.*?>)', '$1' + xmlToMerge)
+        mergedWebXml.text = mergedXML
+    }
+}
+
+task jspcAdmin(dependsOn: [jspcLoggingProperties]) {
+    ext.inputDir = file('src/main/webapp-admin')
+    ext.outputDir = file("${buildDir}/generated/sources/jsp-admin")
+    ext.webXml = file("$outputDir/web.xml")
+    inputs.dir inputDir
+    outputs.dir outputDir
+    doFirst {
+        jspCompile(inputDir as File, outputDir as File, webXml as File,
+                "org.jivesoftware.openfire.plugin.${canonicalName}.jsp.admin")
+    }
+}
+tasks.jspcAdmin.onlyIf { !tasks.jspcAdmin.inputs.files.empty }
+tasks.compileJava.dependsOn tasks.jspcAdmin
+sourceSets.main.java.srcDirs file("${jspcAdmin.outputDir}/java").absolutePath
+
+task jspcClient(dependsOn: [jspcLoggingProperties]) {
+    ext.inputDir = file('src/main/webapp-client')
+    ext.outputDir = file("${buildDir}/generated/sources/jsp-client")
+    ext.webXml = file("$outputDir/web.xml")
+    inputs.dir inputDir
+    outputs.dir outputDir
+    doFirst {
+        jspCompile(inputDir as File, outputDir as File, webXml as File,
+                "org.jivesoftware.openfire.plugin.${canonicalName}.jsp.client")
+    }
+}
+tasks.jspcClient.onlyIf { !tasks.jspcClient.inputs.files.empty }
+tasks.compileJava.dependsOn tasks.jspcClient
+sourceSets.main.java.srcDirs file("${jspcClient.outputDir}/java").absolutePath
+
+task openfirePluginAssembly(type: Jar, dependsOn: [jar]) {
+    dependsOn configurations.runtimeClasspath
+    group = 'build'
+    description = 'Assembles the Openfire-specific plugin JAR file'
+    mustRunAfter(tasks.confirmChangeLog)
+    archiveClassifier.set 'openfire-plugin-assembly'
+
+    from(jar.archiveFile) {
+        into 'lib'
+    }
+    from(configurations.runtimeClasspath) {
+        into 'lib'
+    }
+    from('src/main/resources') {
+        into 'classes'
+    }
+    from('src/plugin') {
+        filesMatching('plugin.xml') {
+            filter(ReplaceTokens, tokens: [
+                    version           : project.version,
+                    releaseDate       : new Date().format("MM/dd/yyyy"),
+                    minOpenfireVersion: minOpenfireVersion,
+                    javaVersion       : java.targetCompatibility as String
+            ])
+        }
+    }
+    from('src/main/webapp-admin') {
+        into 'web'
+        exclude('**/*.jsp*')
+        exclude('**/*.tld')
+        exclude('WEB-INF/web.xml')
+    }
+    from(tasks.jspcAdmin.webXml as File) {
+        into 'web/WEB-INF'
+    }
+    from('src/main/webapp-client') {
+        into 'web-client'
+        exclude('**/*.jsp*')
+        exclude('**/*.tld')
+        exclude('WEB-INF/web.xml')
+    }
+    from(tasks.jspcClient.webXml as File) {
+        into 'web-client/WEB-INF'
+    }
+}
+assemble.dependsOn(openfirePluginAssembly)
+
+// Runtime resources are added to the WAR file by openfirePluginAssembly, so skip that stage
+tasks.processResources.enabled = false
+// But ensure runtime resources are added to the test runtime
+sourceSets.test.resources.srcDir 'src/main/resources'
+
+task deleteOldPluginInOpenfire(type: Delete) {
+    group = 'deploy'
+    description = 'Deletes the current plugin JAR file in the Openfire plugins directory. ' +
+            'Requires the OPENFIRE_HOME environment variable to bet set appropriately.'
+    doFirst {
+        if (System.env.OPENFIRE_HOME == null) {
+            throw new Exception('Unable to delete existing plugin JAR file; OPENFIRE_HOME environment variable is not set')
+        }
+        def pluginDir = new File("${System.env.OPENFIRE_HOME}/plugins")
+        if (!pluginDir.exists() || !pluginDir.isDirectory()) {
+            throw new Exception('Unable to deploy; OPENFIRE_HOME is not set to an Openfire folder')
+        }
+    }
+    delete "${System.env.OPENFIRE_HOME}/plugins/${canonicalName}.jar"
+}
+
+task waitForOpenfireToUnloadPlugin(dependsOn: [deleteOldPluginInOpenfire]) {
+    group = 'deploy'
+    description = 'Waits for Openfire to unload the current plugin. Note that the Jetty bug at ' +
+            'https://github.com/eclipse/jetty.project/issues/1425 means plugins cannot always be unloaded without restarting Openfire.'
+    doFirst {
+        if (System.env.OPENFIRE_HOME == null) {
+            throw new Exception('Unable to wait for existing plugin to unload; OPENFIRE_HOME environment variable is not set')
+        }
+        def startTime = Instant.now()
+        def pluginFolder = new File("${System.env.OPENFIRE_HOME}/plugins/${canonicalName}")
+        print "Waiting for Openfire to unload old ${canonicalName}.jar "
+        while (pluginFolder.exists() && (startTime + Duration.ofMinutes(1)) > Instant.now()) {
+            print '.'
+            sleep(1000)
+        }
+        if (pluginFolder.exists()) {
+            throw new Exception('Timeout waiting for Openfire to unload old plugin; either Openfire is not running or the plugin cannot unload cleanly')
+        } else {
+            println(' unloaded')
+        }
+    }
+}
+tasks.waitForOpenfireToUnloadPlugin.mustRunAfter(tasks.check)
+
+task copyNewPlugin(type: Copy, dependsOn: [openfirePluginAssembly, waitForOpenfireToUnloadPlugin]) {
+    group = 'deploy'
+    description = "Copies the plugin to the Openfire plugins directory."
+    from openfirePluginAssembly.archiveFile
+    into "${System.env.OPENFIRE_HOME}/plugins"
+    rename ".*", "${canonicalName}.jar"
+    doFirst {
+        if (System.env.OPENFIRE_HOME == null) {
+            throw new Exception('Unable to copy the new plugin; OPENFIRE_HOME environment variable is not set')
+        }
+    }
+}
+
+task deploy(dependsOn: [copyNewPlugin]) {
+    group = 'deploy'
+    description = 'Waits for Openfire to load the new plugin.'
+    doFirst {
+        if (System.env.OPENFIRE_HOME == null) {
+            throw new Exception('Unable to install new plugin; OPENFIRE_HOME environment variable is not set')
+        }
+        def startTime = Instant.now()
+        def pluginFolder = new File("${System.env.OPENFIRE_HOME}/plugins/${canonicalName}")
+        print "Waiting for Openfire to install new ${canonicalName}.jar "
+        while (!pluginFolder.exists() && (startTime + Duration.ofMinutes(1)) > Instant.now()) {
+            print '.'
+            sleep(1000)
+        }
+        if (!pluginFolder.exists()) {
+            throw new Exception('Timeout waiting for Openfire to install the plugin; either Openfire is not running or the plugin cannot be installed')
+        } else {
+            println(' installed')
+        }
+    }
+}

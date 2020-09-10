@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration>
+    <Appenders>
+        <File name="file" fileName="build/reports/tests/test.log">
+            <PatternLayout>
+                <Pattern>%d %-5p %X [%c{1}] - %m%n</Pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="file"/>
+        </Root>
+        <!-- Quieten errors from JiveProperties and other classes -->
+        <Logger name="org.jivesoftware.util.JiveProperties" level="off">
+            <AppenderRef ref="file"/>
+        </Logger>
+        <Logger name="org.jivesoftware.util.LocaleUtils" level="off">
+            <AppenderRef ref="file"/>
+        </Logger>
+        <Logger name="org.jivesoftware.database.DbConnectionManager" level="off">
+            <AppenderRef ref="file"/>
+        </Logger>
+    </Loggers>
+</Configuration>
