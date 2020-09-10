@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Password Reset Plugin Readme</title>
+    <style type="text/css">
+        BODY {
+            font-size: 100%;
+        }
+
+        BODY, TD, TH {
+            font-family: tahoma, verdana, arial, helvetica, sans-serif;
+            font-size: 0.8em;
+        }
+
+        H2 {
+            font-size: 11pt;
+            font-weight: bold;
+        }
+
+        H3 {
+            font-size: 10pt;
+            font-style: italic;
+        }
+
+        A:hover {
+            text-decoration: none;
+        }
+
+        H1 {
+            font-family: tahoma, arial, helvetica, sans-serif;
+            font-size: 1.4em;
+            font-weight: bold;
+            border-bottom: 1px #ccc solid;
+            padding-bottom: 2px;
+        }
+
+        TT {
+            font-family: courier new, monospaced, sans-serif;
+            font-weight: bold;
+            color: #060;
+        }
+
+        PRE {
+            font-family: courier new, monospaced, sans-serif;
+            font-size: 100%;
+        }
+
+        #datatable TH {
+            color: #fff;
+            background-color: #2A448C;
+            text-align: left;
+        }
+
+        #datatable TD {
+            background-color: #FAF6EF;
+        }
+    </style>
+</head>
+<body>
+<h1>Password Reset Plugin Readme</h1>
+The Password Reset Plugin allows users to reset their own passwords if they have forgotten them. By supplying their
+Openfire username or password, they will receive an email that will allow them to enter a new password.
+
+<h2>Pre-requisites</h2>
+<ol>
+    <li>Openfire must not be configured with a read-only user authenticator - e.g. the plugin will work with the
+        <code>DefaultAuthProvider</code> but not the <code>LdapAuthProvider</code>.
+    </li>
+    <li>Openfire must be correctly configured with suitable email settings. Login to the Openfire admin console and
+        access Server -&gt; Server Manager -&gt; Email Settings.
+    </li>
+    <li>The user must have an email address configured.</li>
+</ol>
+
+<h2>Configuration</h2>
+To configure the plugin, login to the Openfire admin console and access Server Settings -&gt; Password Reset.
+
+<h2>Credits</h2>
+<div>Icon made from <a href="http://www.onlinewebfonts.com/icon">Icon Fonts</a> is licensed by CC BY 3.0</div>
+
+</body>
+</html>

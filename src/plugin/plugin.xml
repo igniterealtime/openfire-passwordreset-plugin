@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin>
+  <class>org.jivesoftware.openfire.plugin.passwordreset.PasswordResetPlugin</class>
+  <name>Password Reset</name>
+  <description><![CDATA[
+    Provides the ability for users to reset their own passwords if they have forgotten them.
+    ]]></description>
+  <author>Ignite Realtime</author>
+  <version>@version@</version>
+  <date>@releaseDate@</date>
+  <minServerVersion>@minOpenfireVersion@</minServerVersion>
+  <minJavaVersion>@javaVersion@</minJavaVersion>
+  <databaseKey>password-reset</databaseKey>
+  <databaseVersion>1</databaseVersion>
+
+  <adminconsole>
+    <tab id="tab-server">
+      <sidebar id="sidebar-server-settings">
+        <item id="password-reset-conf"
+          name="${passwordreset.sidebar-name}"
+          url="settings.jsp"
+          description="${passwordreset.sidebar-description}"/>
+      </sidebar>
+    </tab>
+  </adminconsole>
+
+</plugin>

@@ -1,0 +1,92 @@
+import com.github.spotbugs.snom.Confidence
+import com.github.spotbugs.snom.Effort
+import com.github.spotbugs.snom.SpotBugsReport
+import com.github.spotbugs.snom.SpotBugsTask
+
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'checkstyle'
+    id 'com.github.spotbugs' version '4.2.1'
+}
+apply from: 'build.openfire-plugin.gradle'
+
+ext.lombokVersion = '1.18.12'
+ext.junitVersion = '5.3.1'
+
+group = 'org.igniterealtime.openfire.plugins'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    withJavadocJar()
+    withSourcesJar()
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+checkstyle {
+    toolVersion '8.31'
+    maxWarnings 0
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+    exclude '**/org/jivesoftware/openfire/plugin/passwordreset/jsp/**'
+}
+
+spotbugs {
+    effort = Effort.MAX
+    reportLevel = Confidence.LOW
+    ignoreFailures.set false
+    extraArgs.add "-longBugCodes"
+}
+
+tasks.withType(SpotBugsTask) {
+    reports(({
+        text.enabled = true
+    } as Closure<NamedDomainObjectContainer<? extends SpotBugsReport>>))
+
+    //noinspection GroovyAssignabilityCheck
+    task "${it.name}Report" {
+        def input = file(reports.getByName("TEXT").destination)
+        inputs.file input
+        doLast {
+            input.readLines().forEach {
+                println(it)
+            }
+        }
+    }
+    it.finalizedBy "${it.name}Report"
+}
+
+spotbugsMain {
+    classes = classes.filter {
+        !it.path.contains(new File('/org/jivesoftware/openfire/plugin/passwordreset/jsp/').path)
+    }
+}
+
+dependencies {
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    implementation 'com.github.bbottema:emailaddress-rfc2822:2.1.4'
+
+    testImplementation 'com.github.spotbugs:spotbugs-annotations:4.0.1'
+    testImplementation platform('org.junit:junit-bom:5.6.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testImplementation 'org.mockito:mockito-junit-jupiter:3.3.3'
+    testImplementation 'org.assertj:assertj-core:3.11.1'
+}
