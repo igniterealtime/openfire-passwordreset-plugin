@@ -421,5 +421,31 @@ public class PasswordResetSettingsServlet extends HttpServlet {
             return this.resetRequests;
         }
 
+        @Override
+        public String toString() {
+            return "Dto{"
+                + "notSupported=" + notSupported
+                + ", enabled=" + enabled
+                + ", server='" + server + '\''
+                + ", serverError='" + serverError + '\''
+                + ", senderName='" + senderName + '\''
+                + ", senderNameError='" + senderNameError + '\''
+                + ", senderAddress='" + senderAddress + '\''
+                + ", senderAddressError='" + senderAddressError + '\''
+                + ", subject='" + subject + '\''
+                + ", subjectError='" + subjectError + '\''
+                + ", body='" + body + '\''
+                + ", bodyError='" + bodyError + '\''
+                + ", expiryCount='" + expiryCount + '\''
+                + ", expiryPeriod='" + expiryPeriod + '\''
+                + ", expiryError='" + expiryError + '\''
+                + ", minLength='" + minLength + '\''
+                + ", minLengthError='" + minLengthError + '\''
+                + ", maxLength='" + maxLength + '\''
+                + ", maxLengthError='" + maxLengthError + '\''
+                + ", valid=" + valid
+                + ", resetRequests=" + resetRequests
+                + '}';
+        }
     }
 }

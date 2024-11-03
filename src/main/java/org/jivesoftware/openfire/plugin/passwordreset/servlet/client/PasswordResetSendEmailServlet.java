@@ -220,6 +220,16 @@ public class PasswordResetSendEmailServlet extends HttpServlet {
             this.emailSent = emailSent;
         }
 
+        @Override
+        public String toString() {
+            return "Form{"
+                + "enabled=" + enabled
+                + ", user='" + user + '\''
+                + ", userError='" + userError + '\''
+                + ", emailSent=" + emailSent
+                + ", valid=" + valid
+                + '}';
+        }
     }
 
 }

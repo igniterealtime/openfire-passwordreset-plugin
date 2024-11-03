@@ -191,5 +191,14 @@ public class PasswordResetTokenManager {
         public Date getExpires() {
             return this.expires;
         }
+
+        @Override
+        public String toString() {
+            return "ResetRequest{"
+                + "userId='" + userId + '\''
+                + ", sourceAddress='" + sourceAddress + '\''
+                + ", expires=" + expires
+                + '}';
+        }
     }
 }

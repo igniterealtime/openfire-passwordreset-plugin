@@ -197,5 +197,13 @@ public class PasswordResetChangePasswordServlet extends HttpServlet {
             return this.valid;
         }
 
+        @Override
+        public String toString() {
+            return "Form{"
+                + "userId='" + userId + '\''
+                + ", token='" + token + '\''
+                + ", valid=" + valid
+                + '}';
+        }
     }
 }
