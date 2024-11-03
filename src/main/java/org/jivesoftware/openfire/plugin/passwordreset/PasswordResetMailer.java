@@ -1,6 +1,5 @@
 package org.jivesoftware.openfire.plugin.passwordreset;
 
-import com.google.common.base.Strings;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,10 +40,9 @@ public class PasswordResetMailer {
      * @param token the token used to identify the request
      */
     public void sendEmail(final User user, final String token) {
-
-        final String email = Strings.nullToEmpty(user.getEmail());
+        final String email = user.getEmail();
         // Ignore empty email address
-        if (email.isEmpty()) {
+        if (email == null || email.isEmpty()) {
             return;
         }
 

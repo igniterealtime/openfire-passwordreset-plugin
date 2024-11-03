@@ -1,13 +1,12 @@
 package org.jivesoftware.openfire.plugin.passwordreset.servlet.admin;
 
+import static java.util.Arrays.asList;
 import static org.jivesoftware.openfire.plugin.passwordreset.PasswordResetPlugin.localize;
 
-import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -154,7 +153,7 @@ public class PasswordResetSettingsServlet extends HttpServlet {
     public static final class Dto {
 
         private static final int MAX_PROP_LENGTH = 4000;
-        private static final Set<ChronoUnit> SUPPORTED_UNITS = ImmutableSet.of(
+        private static final List<ChronoUnit> SUPPORTED_UNITS = asList(
             ChronoUnit.MINUTES,
             ChronoUnit.HOURS,
             ChronoUnit.DAYS
