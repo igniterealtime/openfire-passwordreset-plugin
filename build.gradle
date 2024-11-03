@@ -11,7 +11,6 @@ plugins {
 }
 apply from: 'build.openfire-plugin.gradle'
 
-ext.lombokVersion = '1.18.12'
 ext.junitVersion = '5.3.1'
 
 group = 'org.igniterealtime.openfire.plugins'
@@ -31,7 +30,7 @@ test {
 }
 
 checkstyle {
-    toolVersion '8.31'
+    toolVersion '9.3'
     maxWarnings 0
 }
 
@@ -75,12 +74,6 @@ spotbugsMain {
 }
 
 dependencies {
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-
-    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
-    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-
     implementation 'com.github.bbottema:emailaddress-rfc2822:2.1.4'
 
     testImplementation 'com.github.spotbugs:spotbugs-annotations:4.0.1'

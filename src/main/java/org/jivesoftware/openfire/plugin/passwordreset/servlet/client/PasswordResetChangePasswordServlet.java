@@ -9,16 +9,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.jivesoftware.admin.FlashMessageTag;
 import org.jivesoftware.openfire.plugin.passwordreset.PasswordResetPlugin;
 import org.jivesoftware.openfire.plugin.passwordreset.PasswordResetTokenManager;
 import org.jivesoftware.openfire.user.User;
 import org.jivesoftware.util.ParamUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 public class PasswordResetChangePasswordServlet extends HttpServlet {
+
+    private static final Logger log
+        = LoggerFactory.getLogger(PasswordResetChangePasswordServlet.class);
 
     private static final long serialVersionUID = -5668541154412417961L;
     private static PasswordResetTokenManager resetTokenManager;
@@ -34,6 +36,7 @@ public class PasswordResetChangePasswordServlet extends HttpServlet {
         PasswordResetChangePasswordServlet.resetTokenManager = resetTokenManager;
     }
 
+    @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
         throws ServletException, IOException {
         final String token = ParamUtils.getStringParameter(request, "token", "");
@@ -64,6 +67,7 @@ public class PasswordResetChangePasswordServlet extends HttpServlet {
         response.sendRedirect(request.getRequestURI());
     }
 
+    @Override
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
         throws ServletException, IOException {
 
@@ -115,7 +119,6 @@ public class PasswordResetChangePasswordServlet extends HttpServlet {
             .forward(request, response);
     }
 
-    @Data
     public static class Form {
 
         private final String userId;
@@ -164,6 +167,43 @@ public class PasswordResetChangePasswordServlet extends HttpServlet {
                 return localize("passwordreset.change-password.new-password-too-long", maxLength);
             }
             return "";
+        }
+
+        public String getUserId() {
+            return this.userId;
+        }
+
+        public String getToken() {
+            return this.token;
+        }
+
+        public String getNewPassword() {
+            return this.newPassword;
+        }
+
+        public String getNewPasswordError() {
+            return this.newPasswordError;
+        }
+
+        public String getNewPasswordConfirmation() {
+            return this.newPasswordConfirmation;
+        }
+
+        public String getNewPasswordConfirmationError() {
+            return this.newPasswordConfirmationError;
+        }
+
+        public boolean isValid() {
+            return this.valid;
+        }
+
+        @Override
+        public String toString() {
+            return "Form{"
+                + "userId='" + userId + '\''
+                + ", token='" + token + '\''
+                + ", valid=" + valid
+                + '}';
         }
     }
 }

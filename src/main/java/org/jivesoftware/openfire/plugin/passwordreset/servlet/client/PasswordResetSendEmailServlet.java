@@ -10,8 +10,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.jivesoftware.admin.FlashMessageTag;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.plugin.passwordreset.PasswordResetMailer;
@@ -22,10 +20,13 @@ import org.jivesoftware.openfire.user.UserManager;
 import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.jivesoftware.openfire.user.UserProvider;
 import org.jivesoftware.util.ParamUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmpp.packet.JID;
 
-@Slf4j
 public class PasswordResetSendEmailServlet extends HttpServlet {
+
+    private static final Logger log = LoggerFactory.getLogger(PasswordResetSendEmailServlet.class);
 
     private static final long serialVersionUID = -7605965376783076351L;
     private static final int BATCH_SIZE = 50;
@@ -161,7 +162,6 @@ public class PasswordResetSendEmailServlet extends HttpServlet {
         }
     }
 
-    @Data
     public static class Form {
 
         private final boolean enabled;
@@ -194,6 +194,41 @@ public class PasswordResetSendEmailServlet extends HttpServlet {
                 return "passwordreset.send-email.no-user";
             }
             return "";
+        }
+
+        public boolean isEnabled() {
+            return this.enabled;
+        }
+
+        public String getUser() {
+            return this.user;
+        }
+
+        public String getUserError() {
+            return this.userError;
+        }
+
+        public boolean isEmailSent() {
+            return this.emailSent;
+        }
+
+        public boolean isValid() {
+            return this.valid;
+        }
+
+        public void setEmailSent(boolean emailSent) {
+            this.emailSent = emailSent;
+        }
+
+        @Override
+        public String toString() {
+            return "Form{"
+                + "enabled=" + enabled
+                + ", user='" + user + '\''
+                + ", userError='" + userError + '\''
+                + ", emailSent=" + emailSent
+                + ", valid=" + valid
+                + '}';
         }
     }
 
