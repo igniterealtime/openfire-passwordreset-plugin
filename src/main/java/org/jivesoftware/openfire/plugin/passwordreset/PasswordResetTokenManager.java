@@ -61,15 +61,14 @@ public class PasswordResetTokenManager {
      */
     public String generateToken(final User user, final String sourceAddress) throws SQLException {
         purgeOldTokens();
+        Instant expires = Instant.now().plus(PasswordResetPlugin.EXPIRY.getValue());
         final String token = StringUtils.randomString(TOKEN_LENGTH);
         try (final Connection connection = connectionSupplier.get();
             final PreparedStatement statement = connection.prepareStatement(INSERT_SQL)) {
             statement.setString(1, token);
             statement.setString(2, user.getUsername());
             statement.setString(3, sourceAddress);
-            statement.setTimestamp(4,
-                new Timestamp(Instant.now().plus(PasswordResetPlugin.EXPIRY.getValue())
-                    .toEpochMilli()));
+            statement.setTimestamp(4, Timestamp.from(expires));
             statement.execute();
         }
         return token;
