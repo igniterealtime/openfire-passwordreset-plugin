@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.hazlewood.connor.bottema.emailaddress.EmailAddressValidator;
 import org.jivesoftware.admin.FlashMessageTag;
 import org.jivesoftware.openfire.plugin.passwordreset.PasswordResetMailer;
@@ -28,9 +26,12 @@ import org.jivesoftware.util.JiveConstants;
 import org.jivesoftware.util.ParamUtils;
 import org.jivesoftware.util.StringUtils;
 import org.jivesoftware.util.WebManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 public class PasswordResetSettingsServlet extends HttpServlet {
+
+    private static final Logger log = LoggerFactory.getLogger(PasswordResetSettingsServlet.class);
 
     private static final long serialVersionUID = -2522058940676139518L;
     private static UserProvider userProvider;
@@ -149,7 +150,6 @@ public class PasswordResetSettingsServlet extends HttpServlet {
         response.sendRedirect(request.getRequestURI());
     }
 
-    @Data
     public static final class Dto {
 
         private static final int MAX_PROP_LENGTH = 4000;
@@ -336,5 +336,90 @@ public class PasswordResetSettingsServlet extends HttpServlet {
         private Duration getExpiry() {
             return Duration.of(Long.parseLong(expiryCount), ChronoUnit.valueOf(expiryPeriod));
         }
+
+        public boolean isNotSupported() {
+            return this.notSupported;
+        }
+
+        public boolean isEnabled() {
+            return this.enabled;
+        }
+
+        public String getServer() {
+            return this.server;
+        }
+
+        public String getServerError() {
+            return this.serverError;
+        }
+
+        public String getSenderName() {
+            return this.senderName;
+        }
+
+        public String getSenderNameError() {
+            return this.senderNameError;
+        }
+
+        public String getSenderAddress() {
+            return this.senderAddress;
+        }
+
+        public String getSenderAddressError() {
+            return this.senderAddressError;
+        }
+
+        public String getSubject() {
+            return this.subject;
+        }
+
+        public String getSubjectError() {
+            return this.subjectError;
+        }
+
+        public String getBody() {
+            return this.body;
+        }
+
+        public String getBodyError() {
+            return this.bodyError;
+        }
+
+        public String getExpiryCount() {
+            return this.expiryCount;
+        }
+
+        public String getExpiryPeriod() {
+            return this.expiryPeriod;
+        }
+
+        public String getExpiryError() {
+            return this.expiryError;
+        }
+
+        public String getMinLength() {
+            return this.minLength;
+        }
+
+        public String getMinLengthError() {
+            return this.minLengthError;
+        }
+
+        public String getMaxLength() {
+            return this.maxLength;
+        }
+
+        public String getMaxLengthError() {
+            return this.maxLengthError;
+        }
+
+        public boolean isValid() {
+            return this.valid;
+        }
+
+        public List<ResetRequest> getResetRequests() {
+            return this.resetRequests;
+        }
+
     }
 }

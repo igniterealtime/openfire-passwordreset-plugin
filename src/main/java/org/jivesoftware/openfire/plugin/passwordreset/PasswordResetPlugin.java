@@ -4,7 +4,6 @@ import java.io.File;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -17,9 +16,12 @@ import org.jivesoftware.openfire.user.UserManager;
 import org.jivesoftware.util.EmailService;
 import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.SystemProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 public class PasswordResetPlugin implements Plugin {
+
+    private static final Logger log = LoggerFactory.getLogger(PasswordResetPlugin.class);
 
     public static final String PLUGIN_NAME = "Password Reset"; // Exact match to plugin.xml
     public static final SystemProperty<Boolean> ENABLED =

@@ -13,15 +13,16 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.jivesoftware.openfire.user.User;
 import org.jivesoftware.openfire.user.UserManager;
 import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.jivesoftware.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 public class PasswordResetTokenManager {
+
+    private static final Logger log = LoggerFactory.getLogger(PasswordResetTokenManager.class);
 
     private static final int TOKEN_LENGTH = 32;
     private static final String INSERT_SQL =
@@ -161,10 +162,34 @@ public class PasswordResetTokenManager {
         }
     }
 
-    @Data
     public static class ResetRequest {
         public final String userId;
         public final String sourceAddress;
         public final Date expires;
+
+
+        /**
+         * ResetRequest Constructor.
+         * @param userId userId
+         * @param sourceAddress sourceAddress
+         * @param expires expires
+         */
+        public ResetRequest(String userId, String sourceAddress, Date expires) {
+            this.userId = userId;
+            this.sourceAddress = sourceAddress;
+            this.expires = expires;
+        }
+
+        public String getUserId() {
+            return this.userId;
+        }
+
+        public String getSourceAddress() {
+            return this.sourceAddress;
+        }
+
+        public Date getExpires() {
+            return this.expires;
+        }
     }
 }
