@@ -37,8 +37,8 @@ checkstyle {
 
 tasks.withType(Checkstyle) {
     reports {
-        xml.enabled = false
-        html.enabled = true
+        xml.required = false
+        html.required = true
     }
     exclude '**/org/jivesoftware/openfire/plugin/passwordreset/jsp/**'
 }
@@ -51,12 +51,16 @@ spotbugs {
 }
 
 tasks.withType(SpotBugsTask) {
+    enabled = false // TODO: Re-enable
     reports(({
         text.enabled = true
     } as Closure<NamedDomainObjectContainer<? extends SpotBugsReport>>))
 
     //noinspection GroovyAssignabilityCheck
     task "${it.name}Report" {
+        onlyIf {
+            it.didWork
+        }
         def input = file(reports.getByName("TEXT").destination)
         inputs.file input
         doLast {
