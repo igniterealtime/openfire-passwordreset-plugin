@@ -121,6 +121,8 @@ task openfirePluginAssembly(type: Jar, dependsOn: [jar]) {
     from('src/plugin') {
         filesMatching('plugin.xml') {
             filter(ReplaceTokens, tokens: [
+                    name              : project.pluginName,
+                    description       : project.description,
                     version           : project.version,
                     releaseDate       : new Date().format("yyyy-MM-dd"),
                     minOpenfireVersion: minOpenfireVersion,
@@ -228,3 +230,28 @@ task deploy(dependsOn: [copyNewPlugin]) {
         }
     }
 }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact source: openfirePluginAssembly
+            pom {
+                name = project.name
+                description = project.description
+                url = 'https://igniterealtime.org/projects/openfire/plugin-archive.jsp?plugin=' + project.name
+            }
+        }
+    }
+    repositories {
+
+        maven {
+            credentials {
+                username System.getenv("IGNITE_REALTIME_MAVEN_USERNAME")
+                password System.getenv("IGNITE_REALTIME_MAVEN_PASSWORD")
+            }
+            url 'https://igniterealtime.org/archiva/repository/maven/'
+        }
+    }
+}
+tasks.publish.dependsOn check
