@@ -1,5 +1,7 @@
 package org.jivesoftware.openfire.plugin.passwordreset;
 
+import static java.util.Objects.requireNonNull;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -63,8 +65,9 @@ public class PasswordResetTokenManager {
         purgeOldTokens();
         Instant expires = Instant.now().plus(PasswordResetPlugin.EXPIRY.getValue());
         final String token = StringUtils.randomString(TOKEN_LENGTH);
-        try (final Connection connection = connectionSupplier.get();
-            final PreparedStatement statement = connection.prepareStatement(INSERT_SQL)) {
+        final Connection connection = connectionSupplier.get();
+        requireNonNull(connection);
+        try (final PreparedStatement statement = connection.prepareStatement(INSERT_SQL)) {
             statement.setString(1, token);
             statement.setString(2, user.getUsername());
             statement.setString(3, sourceAddress);
@@ -75,8 +78,9 @@ public class PasswordResetTokenManager {
     }
 
     private void purgeOldTokens() throws SQLException {
-        try (final Connection connection = connectionSupplier.get();
-            final PreparedStatement statement = connection.prepareStatement(PURGE_EXPIRED_SQL)) {
+        final Connection connection = connectionSupplier.get();
+        requireNonNull(connection);
+        try (final PreparedStatement statement = connection.prepareStatement(PURGE_EXPIRED_SQL)) {
             final int updateCount = statement.executeUpdate();
             log.debug("Purged {} records", updateCount);
         }
@@ -91,8 +95,9 @@ public class PasswordResetTokenManager {
      */
     public Optional<User> getUser(final String token) throws SQLException {
         purgeOldTokens();
-        try (final Connection connection = connectionSupplier.get();
-            final PreparedStatement statement = connection.prepareStatement(FIND_USER_SQL)) {
+        final Connection connection = connectionSupplier.get();
+        requireNonNull(connection);
+        try (final PreparedStatement statement = connection.prepareStatement(FIND_USER_SQL)) {
             statement.setString(1, token);
             try (final ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -116,8 +121,9 @@ public class PasswordResetTokenManager {
      * @throws SQLException if something untoward happens
      */
     public void deleteTokens(final User user) throws SQLException {
-        try (final Connection connection = connectionSupplier.get();
-            final PreparedStatement statement
+        final Connection connection = connectionSupplier.get();
+        requireNonNull(connection);
+        try (final PreparedStatement statement
                 = connection.prepareStatement(DELETE_TOKENS_FOR_USER)) {
             statement.setString(1, user.getUsername());
             statement.execute();
@@ -132,8 +138,10 @@ public class PasswordResetTokenManager {
     public List<ResetRequest> getResetRequests() {
         try {
             purgeOldTokens();
-            try (final Connection connection = connectionSupplier.get();
-                final PreparedStatement statement = connection.prepareStatement(RESET_REQUESTS_SQL);
+            final Connection connection = connectionSupplier.get();
+            requireNonNull(connection);
+            try (final PreparedStatement statement
+                    = connection.prepareStatement(RESET_REQUESTS_SQL);
                 final ResultSet resultSet = statement.executeQuery()) {
 
                 final List<ResetRequest> resetRequests = new ArrayList<>();
