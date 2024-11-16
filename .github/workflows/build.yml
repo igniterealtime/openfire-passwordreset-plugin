@@ -1,54 +1,10 @@
-name: Gradle build
-
+# Version 2023-03-05
+name: Java CI
 on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v4
-        with:
-          java-version: 8.0
-          distribution: temurin
-          cache: 'gradle'
-
-      - name: Build with Gradle
-        run: ./gradlew clean build
-
-      - name: Archive artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: artifacts
-          path: build/libs
-
-      - name: Archive code reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: code-reports
-          path: build/reports
-
-  publish:
-    runs-on: ubuntu-latest
-    needs: build
-    if: ${{ contains(github.repository, 'igniterealtime/') && ( ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || contains(github.ref, 'refs/tags/') ) }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v4
-        with:
-          java-version: 8.0
-          distribution: temurin
-          cache: 'gradle'
-
-      - name: Publish
-        run: ./gradlew publish
-        env:
-          IGNITE_REALTIME_MAVEN_USERNAME: ${{ secrets.IGNITE_REALTIME_MAVEN_USERNAME }}
-          IGNITE_REALTIME_MAVEN_PASSWORD: ${{ secrets.IGNITE_REALTIME_MAVEN_PASSWORD }}
-        if: ${{ env.IGNITE_REALTIME_MAVEN_PASSWORD != '' }}
+    uses: igniterealtime/openfire-plugin-builder-action/.github/workflows/openfire-plugin-build.yml@main
+    secrets:
+      IGNITE_REALTIME_MAVEN_USERNAME: ${{ secrets.IGNITE_REALTIME_MAVEN_USERNAME }}
+      IGNITE_REALTIME_MAVEN_PASSWORD: ${{ secrets.IGNITE_REALTIME_MAVEN_PASSWORD }}
