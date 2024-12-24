@@ -120,7 +120,8 @@ public class PasswordResetPlugin implements Plugin {
         this.passwordResetMailer = new PasswordResetMailer(EmailService.getInstance());
         this.resetTokenManager = new PasswordResetTokenManager(
             DbConnectionManager::getConnection,
-            UserManager.getInstance());
+            UserManager.getInstance()
+        );
         setBlankServerDetails();
         log.debug("Plugin created");
     }
@@ -136,13 +137,15 @@ public class PasswordResetPlugin implements Plugin {
             if (httpBindManager.isHttpsBindActive()) {
                 defaultUrl = String.format("https://%s:%d%s",
                     XMPPServer.getInstance().getServerInfo().getHostname(),
-                    httpBindManager.getHttpBindSecurePort(),
-                    CONTEXT_PATH);
+                    HttpBindManager.HTTP_BIND_SECURE_PORT.getValue(),
+                    CONTEXT_PATH
+                );
             } else {
                 defaultUrl = String.format("http://%s:%d%s",
                     XMPPServer.getInstance().getServerInfo().getHostname(),
-                    httpBindManager.getHttpBindUnsecurePort(),
-                    CONTEXT_PATH);
+                    HttpBindManager.HTTP_BIND_PORT.getValue(),
+                    CONTEXT_PATH
+                );
             }
             SERVER.setValue(defaultUrl);
         }

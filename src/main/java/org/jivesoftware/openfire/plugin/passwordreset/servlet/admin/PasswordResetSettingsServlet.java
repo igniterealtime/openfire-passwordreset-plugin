@@ -24,7 +24,6 @@ import org.jivesoftware.openfire.plugin.passwordreset.PasswordResetTokenManager.
 import org.jivesoftware.openfire.user.User;
 import org.jivesoftware.openfire.user.UserManager;
 import org.jivesoftware.openfire.user.UserProvider;
-import org.jivesoftware.util.JiveConstants;
 import org.jivesoftware.util.ParamUtils;
 import org.jivesoftware.util.StringUtils;
 import org.jivesoftware.util.WebManager;
@@ -33,6 +32,9 @@ import org.jivesoftware.util.WebManager;
 public class PasswordResetSettingsServlet extends HttpServlet {
 
     private static final long serialVersionUID = -2522058940676139518L;
+    private static final long MILLISECONDS_IN_MINUTE = Duration.ofMinutes(1).toMillis();
+    private static final long MILLISECONDS_IN_HOUR = Duration.ofHours(1).toMillis();
+    private static final long MILLISECONDS_IN_DAY = Duration.ofDays(1).toMillis();
     private static UserProvider userProvider;
     private static Supplier<WebManager> webManagerSupplier;
     private static PasswordResetMailer passwordResetMailer;
@@ -194,14 +196,14 @@ public class PasswordResetSettingsServlet extends HttpServlet {
             this.body = PasswordResetPlugin.BODY.getValue();
             this.bodyError = "";
             final long expiry = PasswordResetPlugin.EXPIRY.getValue().toMillis();
-            if (expiry % JiveConstants.DAY == 0) {
-                expiryCount = String.valueOf(expiry / JiveConstants.DAY);
+            if (expiry % MILLISECONDS_IN_DAY == 0) {
+                expiryCount = String.valueOf(expiry / MILLISECONDS_IN_DAY);
                 expiryPeriod = ChronoUnit.DAYS.name();
-            } else if (expiry % JiveConstants.HOUR == 0) {
-                expiryCount = String.valueOf(expiry / JiveConstants.HOUR);
+            } else if (expiry % MILLISECONDS_IN_HOUR == 0) {
+                expiryCount = String.valueOf(expiry / MILLISECONDS_IN_HOUR);
                 expiryPeriod = ChronoUnit.HOURS.name();
             } else {
-                expiryCount = String.valueOf(expiry / JiveConstants.MINUTE);
+                expiryCount = String.valueOf(expiry / MILLISECONDS_IN_MINUTE);
                 expiryPeriod = ChronoUnit.MINUTES.name();
             }
             this.expiryError = "";

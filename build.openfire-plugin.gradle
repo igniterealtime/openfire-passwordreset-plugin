@@ -13,9 +13,14 @@ repositories {
     }
 }
 
+configurations {
+    jspc
+}
+
 dependencies {
     compileOnly "org.igniterealtime.openfire:xmppserver:${minOpenfireVersion}"
     testImplementation "org.igniterealtime.openfire:xmppserver:${minOpenfireVersion}"
+    jspc 'org.apache.ant:ant:1.10.15'
 }
 
 def canonicalName = project.name.replaceAll('\\W', '').toLowerCase()
@@ -48,7 +53,11 @@ def jspCompile(File srcDir, File destDir, File mergedWebXml, String javaPackage)
     // Create the target WEB-INF folder so the JspC can create the web.xml.partial
     xmlFragment.getParentFile().mkdirs()
     javaexec {
-        classpath = files(sourceSets.main.compileClasspath, tasks.jspcLoggingProperties.outputFile.parent)
+        classpath = files(
+                sourceSets.main.compileClasspath,
+                tasks.jspcLoggingProperties.outputFile.parent,
+                configurations.jspc
+        )
         main = 'org.apache.jasper.JspC'
         args = ['-webapp', srcDir.absolutePath,
                 '-d', file("${destDir}/java").absolutePath,
@@ -161,15 +170,19 @@ task deleteOldPluginInOpenfire(type: Delete) {
     description = 'Deletes the current plugin JAR file in the Openfire plugins directory. ' +
             'Requires the OPENFIRE_HOME environment variable to bet set appropriately.'
     doFirst {
-        if (System.env.OPENFIRE_HOME == null) {
-            throw new Exception('Unable to delete existing plugin JAR file; OPENFIRE_HOME environment variable is not set')
-        }
-        def pluginDir = new File("${System.env.OPENFIRE_HOME}/plugins")
+        checkOpenfireHomeExists()
+        def pluginDir = new File("${System.getenv('OPENFIRE_HOME')}/plugins")
         if (!pluginDir.exists() || !pluginDir.isDirectory()) {
             throw new Exception('Unable to deploy; OPENFIRE_HOME is not set to an Openfire folder')
         }
     }
-    delete "${System.env.OPENFIRE_HOME}/plugins/${canonicalName}.jar"
+    delete "${System.getenv('OPENFIRE_HOME')}/plugins/${canonicalName}.jar"
+}
+
+def checkOpenfireHomeExists() {
+    if (System.getenv('OPENFIRE_HOME') == null) {
+        throw new Exception('Unable to delete existing plugin JAR file; OPENFIRE_HOME environment variable is not set (remember to gradlew --stop)')
+    }
 }
 
 task waitForOpenfireToUnloadPlugin(dependsOn: [deleteOldPluginInOpenfire]) {
@@ -177,11 +190,9 @@ task waitForOpenfireToUnloadPlugin(dependsOn: [deleteOldPluginInOpenfire]) {
     description = 'Waits for Openfire to unload the current plugin. Note that the Jetty bug at ' +
             'https://github.com/eclipse/jetty.project/issues/1425 means plugins cannot always be unloaded without restarting Openfire.'
     doFirst {
-        if (System.env.OPENFIRE_HOME == null) {
-            throw new Exception('Unable to wait for existing plugin to unload; OPENFIRE_HOME environment variable is not set')
-        }
+        checkOpenfireHomeExists()
         def startTime = Instant.now()
-        def pluginFolder = new File("${System.env.OPENFIRE_HOME}/plugins/${canonicalName}")
+        def pluginFolder = new File("${System.getenv('OPENFIRE_HOME')}/plugins/${canonicalName}")
         print "Waiting for Openfire to unload old ${canonicalName}.jar "
         while (pluginFolder.exists() && (startTime + Duration.ofMinutes(1)) > Instant.now()) {
             print '.'
@@ -200,12 +211,10 @@ task copyNewPlugin(type: Copy, dependsOn: [openfirePluginAssembly, waitForOpenfi
     group = 'deploy'
     description = "Copies the plugin to the Openfire plugins directory."
     from openfirePluginAssembly.archiveFile
-    into "${System.env.OPENFIRE_HOME}/plugins"
+    into "${System.getenv('OPENFIRE_HOME')}/plugins"
     rename ".*", "${canonicalName}.jar"
     doFirst {
-        if (System.env.OPENFIRE_HOME == null) {
-            throw new Exception('Unable to copy the new plugin; OPENFIRE_HOME environment variable is not set')
-        }
+        checkOpenfireHomeExists()
     }
 }
 
@@ -213,11 +222,9 @@ task deploy(dependsOn: [copyNewPlugin]) {
     group = 'deploy'
     description = 'Waits for Openfire to load the new plugin.'
     doFirst {
-        if (System.env.OPENFIRE_HOME == null) {
-            throw new Exception('Unable to install new plugin; OPENFIRE_HOME environment variable is not set')
-        }
+        checkOpenfireHomeExists()
         def startTime = Instant.now()
-        def pluginFolder = new File("${System.env.OPENFIRE_HOME}/plugins/${canonicalName}")
+        def pluginFolder = new File("${System.getenv('OPENFIRE_HOME')}/plugins/${canonicalName}")
         print "Waiting for Openfire to install new ${canonicalName}.jar "
         while (!pluginFolder.exists() && (startTime + Duration.ofMinutes(1)) > Instant.now()) {
             print '.'
