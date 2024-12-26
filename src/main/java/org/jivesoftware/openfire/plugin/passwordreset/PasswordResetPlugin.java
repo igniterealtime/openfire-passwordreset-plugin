@@ -1,5 +1,6 @@
 package org.jivesoftware.openfire.plugin.passwordreset;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -19,6 +20,7 @@ import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.SystemProperty;
 
 @Slf4j
+@SuppressFBWarnings({"EI_EXPOSE_REP", "MS_EXPOSE_REP"})
 public class PasswordResetPlugin implements Plugin {
 
     public static final String PLUGIN_NAME = "Password Reset"; // Exact match to plugin.xml

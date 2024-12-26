@@ -31,6 +31,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.quality.Strictness;
 
 @ExtendWith(MockitoExtension.class)
 class PasswordResetSettingsServletTest {
@@ -94,7 +95,10 @@ class PasswordResetSettingsServletTest {
     }
 
     private HttpServletRequest blankRequest() {
-        final HttpServletRequest request = mock(HttpServletRequest.class, withSettings().lenient());
+        final HttpServletRequest request = mock(
+            HttpServletRequest.class,
+            withSettings().strictness(Strictness.LENIENT)
+        );
         doReturn(REQUEST_URI).when(request)
             .getRequestURI();
         doReturn(requestDispatcher).when(request)

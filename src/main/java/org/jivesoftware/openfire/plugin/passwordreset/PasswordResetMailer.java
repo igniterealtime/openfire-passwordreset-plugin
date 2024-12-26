@@ -1,11 +1,13 @@
 package org.jivesoftware.openfire.plugin.passwordreset;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.util.Locale;
 import java.util.Set;
 import org.jivesoftware.openfire.user.User;
 import org.jivesoftware.util.EmailService;
 
+@SuppressFBWarnings({"EI_EXPOSE_REP2"})
 public class PasswordResetMailer {
 
     // Avoid sending emails to domains that are "special"

@@ -7,21 +7,25 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'checkstyle'
-    id 'com.github.spotbugs' version '4.8.0'
+    id 'com.github.spotbugs' version '6.0.27'
+    id 'com.github.ben-manes.versions' version '0.51.0'
 }
-apply from: 'build.openfire-plugin.gradle'
 
-ext.lombokVersion = '1.18.36'
-ext.junitVersion = '5.3.1'
-
-group = 'org.igniterealtime.openfire.plugins'
+ext {
+    minOpenfireVersion = '4.7.0'
+    pluginName = 'Password Reset'
+    pluginDescription = 'Provides the ability for users to reset their own passwords if they have forgotten them.'
+}
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
     withJavadocJar()
     withSourcesJar()
 }
+
+apply from: 'build.openfire-plugin.gradle'
 
 test {
     useJUnitPlatform()
@@ -31,34 +35,35 @@ test {
 }
 
 checkstyle {
-    toolVersion '8.31'
-    maxWarnings 0
+    toolVersion = '8.31'
+    maxWarnings = 0
 }
 
-tasks.withType(Checkstyle) {
+tasks.withType(Checkstyle).configureEach {
     reports {
-        xml.enabled = false
-        html.enabled = true
+        xml.required = false
+        html.required = true
     }
     exclude '**/org/jivesoftware/openfire/plugin/passwordreset/jsp/**'
 }
 
 spotbugs {
     effort = Effort.MAX
-    reportLevel = Confidence.LOW
+    reportLevel = Confidence.values()[0] // LOW - See also https://github.com/spotbugs/spotbugs-gradle-plugin/issues/972
     ignoreFailures.set false
     extraArgs.add "-longBugCodes"
 }
 
+//noinspection ConfigurationAvoidance - as this registers a new task, we can't use .forEach
 tasks.withType(SpotBugsTask) {
-    enabled false // For now
     reports(({
         text.enabled = true
+        xml.enabled = false
     } as Closure<NamedDomainObjectContainer<? extends SpotBugsReport>>))
 
     //noinspection GroovyAssignabilityCheck
-    task "${it.name}Report" {
-        def input = file(reports.getByName("TEXT").destination)
+    tasks.register("${it.name}Report") {
+        def input = reports.named("text").get().outputLocation.asFile.get()
         inputs.file input
         doLast {
             input.readLines().forEach {
@@ -66,7 +71,7 @@ tasks.withType(SpotBugsTask) {
             }
         }
     }
- //   it.finalizedBy "${it.name}Report"
+    it.finalizedBy "${it.name}Report"
 }
 
 spotbugsMain {
@@ -76,21 +81,31 @@ spotbugsMain {
 }
 
 dependencies {
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
-    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    def lombok = 'org.projectlombok:lombok:1.18.36'
 
-    implementation 'com.github.bbottema:emailaddress-rfc2822:2.1.4'
+    annotationProcessor lombok
+
+    compileOnly lombok
+    compileOnly 'com.github.spotbugs:spotbugs-annotations:4.8.6'
+
+    implementation 'com.github.bbottema:emailaddress-rfc2822:2.3.1'
+
+    testAnnotationProcessor lombok
+
+    testCompileOnly lombok
 
     testImplementation 'com.github.spotbugs:spotbugs-annotations:4.0.1'
-    testImplementation platform('org.junit:junit-bom:5.6.2')
+    testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.14.2'
+    testImplementation 'org.assertj:assertj-core:3.27.0'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-    testImplementation 'org.mockito:mockito-junit-jupiter:3.3.3'
-    testImplementation 'org.assertj:assertj-core:3.11.1'
 }
+
+dependencyUpdates.gradleReleaseChannel="current"
 
 // See https://github.com/jeremylong/DependencyCheck/issues/2764#issuecomment-680680558 flr an expla nation
 dependencies {

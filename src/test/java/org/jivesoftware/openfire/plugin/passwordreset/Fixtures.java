@@ -16,6 +16,7 @@ import org.jivesoftware.openfire.container.PluginManager;
 import org.jivesoftware.util.JiveGlobals;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.quality.Strictness;
 import org.xmpp.packet.JID;
 
 @SuppressWarnings({"WeakerAccess"})
@@ -73,7 +74,10 @@ public final class Fixtures {
         value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT",
         justification = "False positive")
     public static XMPPServer mockXmppServer() {
-        final XMPPServer xmppServer = mock(XMPPServer.class, withSettings().lenient());
+        final XMPPServer xmppServer = mock(
+            XMPPServer.class,
+            withSettings().strictness(Strictness.LENIENT)
+        );
         doAnswer(invocationOnMock -> {
             final JID jid = invocationOnMock.getArgument(0);
             return jid.getDomain().equals(XMPP_DOMAIN);
@@ -92,7 +96,10 @@ public final class Fixtures {
      * @return a mock XMPPServerInfo
      */
     public static XMPPServerInfo mockXmppServerInfo() {
-        final XMPPServerInfo xmppServerInfo = mock(XMPPServerInfo.class, withSettings().lenient());
+        final XMPPServerInfo xmppServerInfo = mock(
+            XMPPServerInfo.class,
+            withSettings().strictness(Strictness.LENIENT)
+        );
         doReturn(XMPP_DOMAIN).when(xmppServerInfo).getXMPPDomain();
         return xmppServerInfo;
     }
@@ -103,7 +110,7 @@ public final class Fixtures {
      * @return a mock IQRouter
      */
     public static IQRouter mockIqRouter() {
-        return mock(IQRouter.class, withSettings().lenient());
+        return mock(IQRouter.class, withSettings().strictness(Strictness.LENIENT));
     }
 
     /**
@@ -112,7 +119,7 @@ public final class Fixtures {
      * @return a mock PluginManager
      */
     public static PluginManager mockPluginManager() {
-        return mock(PluginManager.class, withSettings().lenient());
+        return mock(PluginManager.class, withSettings().strictness(Strictness.LENIENT));
     }
 
 }

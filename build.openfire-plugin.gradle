@@ -6,10 +6,10 @@ import java.time.Instant
 repositories {
     mavenCentral()
     maven {
-        url 'https://maven.atlassian.com/repository/public'
+        url = 'https://maven.atlassian.com/repository/public'
     }
     maven {
-        url 'https://igniterealtime.org/archiva/repository/maven/'
+        url = 'https://igniterealtime.org/archiva/repository/maven/'
     }
 }
 
@@ -25,7 +25,7 @@ dependencies {
 
 def canonicalName = project.name.replaceAll('\\W', '').toLowerCase()
 
-task confirmChangeLog() {
+tasks.register('confirmChangeLog') {
     group = 'verification'
     description = 'Checks the changelog contains the current date - but only if this is not a SNAPSHOT version'
     def changelog = new File('src/plugin/changelog.html')
@@ -40,8 +40,8 @@ task confirmChangeLog() {
 tasks.confirmChangeLog.onlyIf { !(project.version as String).contains("SNAPSHOT") }
 tasks.check.dependsOn tasks.confirmChangeLog
 
-task jspcLoggingProperties(type: WriteProperties) {
-    outputFile = file("$buildDir/jspc-log4j/log4j2.properties")
+tasks.register('jspcLoggingProperties', WriteProperties) {
+    destinationFile = file("${layout.buildDirectory.get()}/jspc-log4j/log4j2.properties")
     property('appender.console.type', 'Console')
     property('appender.console.name', 'STDOUT')
     property('appender.console.layout.type', 'PatternLayout')
@@ -52,13 +52,13 @@ def jspCompile(File srcDir, File destDir, File mergedWebXml, String javaPackage)
     def xmlFragment = file("${destDir}/web.xml.fragment")
     // Create the target WEB-INF folder so the JspC can create the web.xml.partial
     xmlFragment.getParentFile().mkdirs()
-    javaexec {
+    providers.javaexec {
         classpath = files(
                 sourceSets.main.compileClasspath,
-                tasks.jspcLoggingProperties.outputFile.parent,
+                tasks.jspcLoggingProperties.destinationFile.getAsFile().get().parent,
                 configurations.jspc
         )
-        main = 'org.apache.jasper.JspC'
+        mainClass = 'org.apache.jasper.JspC'
         args = ['-webapp', srcDir.absolutePath,
                 '-d', file("${destDir}/java").absolutePath,
                 '-p', javaPackage,
@@ -81,10 +81,11 @@ def jspCompile(File srcDir, File destDir, File mergedWebXml, String javaPackage)
     }
 }
 
-task jspcAdmin(dependsOn: [jspcLoggingProperties]) {
+tasks.register('jspcAdmin') {
+    dependsOn jspcLoggingProperties
     ext.inputDir = file('src/main/webapp-admin')
-    ext.outputDir = file("${buildDir}/generated/sources/jsp-admin")
-    ext.webXml = file("$outputDir/web.xml")
+    ext.outputDir = file("${layout.buildDirectory.get()}/generated/sources/jsp-admin")
+    ext.webXml = file("${outputDir}/web.xml")
     inputs.dir inputDir
     outputs.dir outputDir
     doFirst {
@@ -96,10 +97,11 @@ tasks.jspcAdmin.onlyIf { !tasks.jspcAdmin.inputs.files.empty }
 tasks.compileJava.dependsOn tasks.jspcAdmin
 sourceSets.main.java.srcDirs file("${jspcAdmin.outputDir}/java").absolutePath
 
-task jspcClient(dependsOn: [jspcLoggingProperties]) {
+tasks.register('jspcClient') {
+    dependsOn jspcLoggingProperties
     ext.inputDir = file('src/main/webapp-client')
-    ext.outputDir = file("${buildDir}/generated/sources/jsp-client")
-    ext.webXml = file("$outputDir/web.xml")
+    ext.outputDir = file("${layout.buildDirectory.get()}/generated/sources/jsp-client")
+    ext.webXml = file("${outputDir}/web.xml")
     inputs.dir inputDir
     outputs.dir outputDir
     doFirst {
@@ -111,7 +113,10 @@ tasks.jspcClient.onlyIf { !tasks.jspcClient.inputs.files.empty }
 tasks.compileJava.dependsOn tasks.jspcClient
 sourceSets.main.java.srcDirs file("${jspcClient.outputDir}/java").absolutePath
 
-task openfirePluginAssembly(type: Jar, dependsOn: [jar]) {
+tasks.sourcesJar.dependsOn jspcAdmin, jspcClient
+
+tasks.register('openfirePluginAssembly', Jar) {
+    dependsOn jar
     dependsOn configurations.runtimeClasspath
     group = 'build'
     description = 'Assembles the Openfire-specific plugin JAR file'
@@ -130,12 +135,12 @@ task openfirePluginAssembly(type: Jar, dependsOn: [jar]) {
     from('src/plugin') {
         filesMatching('plugin.xml') {
             filter(ReplaceTokens, tokens: [
-                    name              : project.pluginName,
-                    description       : project.description,
-                    version           : project.version,
+                    name              : pluginName,
+                    description       : pluginDescription,
+                    version           : version,
                     releaseDate       : new Date().format("yyyy-MM-dd"),
                     minOpenfireVersion: minOpenfireVersion,
-                    javaVersion       : java.targetCompatibility as String
+                    javaVersion       : java.toolchain.languageVersion.get().toString()
             ])
         }
     }
@@ -165,7 +170,7 @@ tasks.processResources.enabled = false
 // But ensure runtime resources are added to the test runtime
 sourceSets.test.resources.srcDir 'src/main/resources'
 
-task deleteOldPluginInOpenfire(type: Delete) {
+tasks.register('deleteOldPluginInOpenfire', Delete) {
     group = 'deploy'
     description = 'Deletes the current plugin JAR file in the Openfire plugins directory. ' +
             'Requires the OPENFIRE_HOME environment variable to bet set appropriately.'
@@ -179,13 +184,14 @@ task deleteOldPluginInOpenfire(type: Delete) {
     delete "${System.getenv('OPENFIRE_HOME')}/plugins/${canonicalName}.jar"
 }
 
-def checkOpenfireHomeExists() {
+static def checkOpenfireHomeExists() {
     if (System.getenv('OPENFIRE_HOME') == null) {
         throw new Exception('Unable to delete existing plugin JAR file; OPENFIRE_HOME environment variable is not set (remember to gradlew --stop)')
     }
 }
 
-task waitForOpenfireToUnloadPlugin(dependsOn: [deleteOldPluginInOpenfire]) {
+tasks.register('waitForOpenfireToUnloadPlugin') {
+    dependsOn deleteOldPluginInOpenfire
     group = 'deploy'
     description = 'Waits for Openfire to unload the current plugin. Note that the Jetty bug at ' +
             'https://github.com/eclipse/jetty.project/issues/1425 means plugins cannot always be unloaded without restarting Openfire.'
@@ -207,7 +213,8 @@ task waitForOpenfireToUnloadPlugin(dependsOn: [deleteOldPluginInOpenfire]) {
 }
 tasks.waitForOpenfireToUnloadPlugin.mustRunAfter(tasks.check)
 
-task copyNewPlugin(type: Copy, dependsOn: [openfirePluginAssembly, waitForOpenfireToUnloadPlugin]) {
+tasks.register('copyNewPlugin', Copy) {
+    dependsOn openfirePluginAssembly, waitForOpenfireToUnloadPlugin
     group = 'deploy'
     description = "Copies the plugin to the Openfire plugins directory."
     from openfirePluginAssembly.archiveFile
@@ -218,7 +225,8 @@ task copyNewPlugin(type: Copy, dependsOn: [openfirePluginAssembly, waitForOpenfi
     }
 }
 
-task deploy(dependsOn: [copyNewPlugin]) {
+tasks.register('deploy') {
+    dependsOn copyNewPlugin
     group = 'deploy'
     description = 'Waits for Openfire to load the new plugin.'
     doFirst {
@@ -240,12 +248,14 @@ task deploy(dependsOn: [copyNewPlugin]) {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        plugin(MavenPublication) {
             from components.java
-            artifact source: openfirePluginAssembly
+            artifact openfirePluginAssembly
             pom {
-                name = project.name
-                description = project.description
+                groupId = 'org.igniterealtime.openfire.plugins'
+                artifactId = canonicalName
+                name = pluginName
+                description = pluginDescription
                 url = 'https://igniterealtime.org/projects/openfire/plugin-archive.jsp?plugin=' + project.name
             }
         }
@@ -254,10 +264,10 @@ publishing {
 
         maven {
             credentials {
-                username System.getenv("IGNITE_REALTIME_MAVEN_USERNAME")
-                password System.getenv("IGNITE_REALTIME_MAVEN_PASSWORD")
+                username = System.getenv("IGNITE_REALTIME_MAVEN_USERNAME")
+                password = System.getenv("IGNITE_REALTIME_MAVEN_PASSWORD")
             }
-            url 'https://igniterealtime.org/archiva/repository/maven/'
+            url = 'https://igniterealtime.org/archiva/repository/maven/'
         }
     }
 }
