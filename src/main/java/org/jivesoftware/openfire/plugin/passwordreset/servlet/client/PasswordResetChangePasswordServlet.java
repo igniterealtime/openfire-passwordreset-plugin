@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.Data;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.jivesoftware.admin.FlashMessageTag;
 import org.jivesoftware.openfire.plugin.passwordreset.PasswordResetPlugin;
@@ -88,7 +89,7 @@ public class PasswordResetChangePasswordServlet extends HttpServlet {
         if (form.valid) {
             try {
                 final Optional<User> optionalUser = resetTokenManager.getUser(form.token);
-                if (!optionalUser.isPresent()) {
+                if (optionalUser.isEmpty()) {
                     request.getRequestDispatcher("password-reset-bad-token.jsp")
                         .forward(request, response);
                     return;
@@ -120,9 +121,15 @@ public class PasswordResetChangePasswordServlet extends HttpServlet {
 
         private final String userId;
         private final String token;
+        @ToString.Exclude
         private final String newPassword;
+        @ToString.Include(name = "newPassword")
+        private static final String maskedNewPassword = "********";
         private final String newPasswordError;
+        @ToString.Exclude
         private final String newPasswordConfirmation;
+        @ToString.Include(name = "newPasswordConfirmation")
+        private static final String maskedNewPasswordConfirmation = "********";
         private final String newPasswordConfirmationError;
         private final boolean valid;
 
