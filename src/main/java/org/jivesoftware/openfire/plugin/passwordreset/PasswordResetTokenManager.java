@@ -1,5 +1,6 @@
 package org.jivesoftware.openfire.plugin.passwordreset;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,6 +20,7 @@ import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.jivesoftware.util.StringUtils;
 
 @Slf4j
+@SuppressFBWarnings({"EI_EXPOSE_REP2"})
 public class PasswordResetTokenManager {
 
     private static final int TOKEN_LENGTH = 32;

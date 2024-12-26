@@ -1,21 +1,20 @@
 package org.jivesoftware.openfire.plugin.passwordreset;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import org.jivesoftware.openfire.user.User;
 import org.jivesoftware.util.EmailService;
 
+@SuppressFBWarnings({"EI_EXPOSE_REP2"})
 public class PasswordResetMailer {
 
     // Avoid sending emails to domains that are "special"
     // https://en.wikipedia.org/wiki/Example.com
     // https://en.wikipedia.org/wiki/.local
     // https://en.wikipedia.org/wiki/Top-level_domain#Reserved_domains
-    private static final Set<String> IGNORED_DOMAINS = new HashSet<>(
-        Arrays.asList(
+    private static final Set<String> IGNORED_DOMAINS = Set.of(
             "example.com",
             "example.net",
             "example.org",
@@ -25,7 +24,7 @@ public class PasswordResetMailer {
             "invalid",
             "localhost",
             "test"
-        ));
+        );
 
     private final EmailService emailService;
 
