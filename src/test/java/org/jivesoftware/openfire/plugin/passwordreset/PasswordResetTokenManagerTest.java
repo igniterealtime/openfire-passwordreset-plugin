@@ -61,7 +61,7 @@ class PasswordResetTokenManagerTest {
     @SuppressFBWarnings(
         value = {"UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"},
         justification = "False positive")
-    void willGenerateARandomTokenForAUser() throws Exception {
+    void willGenerateRandomTokenForUser() throws Exception {
         final String token1 = resetTokenManager.generateToken(user, "localhost");
         final String token2 = resetTokenManager.generateToken(user, "localhost");
 

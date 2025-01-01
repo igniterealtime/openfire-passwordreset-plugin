@@ -83,7 +83,7 @@ class PasswordResetSettingsServletTest {
     }
 
     @Test
-    void willSetAValidForm() throws Exception {
+    void willSetValidForm() throws Exception {
 
         final HttpServletRequest request = blankRequest();
 
@@ -518,7 +518,7 @@ class PasswordResetSettingsServletTest {
     }
 
     @Test
-    void postWillDoNothingWithAReadOnlyProvider() throws Exception {
+    void postWillDoNothingWithReadOnlyProvider() throws Exception {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn(true).when(userProvider).isReadOnly();
@@ -552,7 +552,7 @@ class PasswordResetSettingsServletTest {
     }
 
     @Test
-    void testWillSendATestEmail() throws Exception {
+    void testWillSendTestEmail() throws Exception {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn(null)
