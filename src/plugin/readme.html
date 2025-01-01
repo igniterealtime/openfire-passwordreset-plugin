@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <title>Password Reset Plugin Readme</title>
-    <style type="text/css">
+    <style>
         BODY {
             font-size: 100%;
         }
@@ -59,10 +59,18 @@
 <body>
 <h1>Password Reset Plugin Readme</h1>
 The Password Reset Plugin allows users to reset their own passwords if they have forgotten them. By supplying their
-Openfire username or password, they will receive an email that will allow them to enter a new password.
+Openfire username or associated email address, they will receive an email that will allow them to enter a new password.
 
 <h2>Pre-requisites</h2>
 <ol>
+    <li>Supported databases are:
+      <ul>
+        <li>HSQLDB</li>
+        <li>PostgreSQL</li>
+        <li>MySQL</li>
+      </ul>
+      However, adding additional database support is relatively simple, feel free to submit a PR!
+    </li>
     <li>Openfire must not be configured with a read-only user authenticator - e.g. the plugin will work with the
         <code>DefaultAuthProvider</code> but not the <code>LdapAuthProvider</code>.
     </li>
@@ -76,7 +84,7 @@ Openfire username or password, they will receive an email that will allow them t
 To configure the plugin, login to the Openfire admin console and access Server Settings -&gt; Password Reset.
 
 <h2>Credits</h2>
-<div>Icon made from <a href="http://www.onlinewebfonts.com/icon">Icon Fonts</a> is licensed by CC BY 3.0</div>
+<div>Icon made from <a href="https://www.onlinewebfonts.com/icon">Icon Fonts</a> is licensed by CC BY 3.0</div>
 
 </body>
 </html>
