@@ -68,7 +68,7 @@ class PasswordResetChangePasswordServletTest {
     }
 
     @Test
-    void getWithAValidTokenWillShowThePasswordChangeForm() throws Exception {
+    void getWithValidTokenWillShowThePasswordChangeForm() throws Exception {
 
         doReturn(requestDispatcher)
             .when(request)
@@ -104,7 +104,7 @@ class PasswordResetChangePasswordServletTest {
     }
 
     @Test
-    void getThatCausesASqlExceptionWillForwardToTheErrorPage() throws Exception {
+    void getThatCausesSqlExceptionWillForwardToTheErrorPage() throws Exception {
 
         doReturn(requestDispatcher)
             .when(request)
@@ -160,7 +160,7 @@ class PasswordResetChangePasswordServletTest {
         justification = "False positive")
     void validFormWillUpdatePasswordAndRedirect() throws Exception {
 
-        giveAValidFormSubmission();
+        givenValidFormSubmission();
         doReturn(session)
             .when(request)
             .getSession();
@@ -181,7 +181,7 @@ class PasswordResetChangePasswordServletTest {
         verify(requestDispatcher).forward(request, response);
     }
 
-    private void giveAValidFormSubmission() {
+    private void givenValidFormSubmission() {
         doReturn(null)
             .when(request)
             .getParameter("cancel");
@@ -208,7 +208,7 @@ class PasswordResetChangePasswordServletTest {
     @Test
     void newPasswordMustNotBeTooShort() throws Exception {
 
-        giveAValidFormSubmission();
+        givenValidFormSubmission();
         doReturn("short")
             .when(request)
             .getParameter("newPassword");
@@ -235,7 +235,7 @@ class PasswordResetChangePasswordServletTest {
     @Test
     void newPasswordMustNotBeTooLong() throws Exception {
 
-        giveAValidFormSubmission();
+        givenValidFormSubmission();
         PasswordResetPlugin.MAX_LENGTH.setValue(8);
         doReturn("newPasswordIsVeryLong")
             .when(request)
@@ -251,7 +251,7 @@ class PasswordResetChangePasswordServletTest {
     @Test
     void passwordConfirmationMustMatch() throws Exception {
 
-        giveAValidFormSubmission();
+        givenValidFormSubmission();
         doReturn("newPasswordIsNotSameAsConfirmationPassword")
             .when(request)
             .getParameter("newPassword");
@@ -266,7 +266,7 @@ class PasswordResetChangePasswordServletTest {
     @Test
     void badTokenWillRedirectToBadTokenPage() throws Exception {
 
-        giveAValidFormSubmission();
+        givenValidFormSubmission();
         doReturn(Optional.empty())
             .when(tokenManager)
             .getUser("bad token");
@@ -290,7 +290,7 @@ class PasswordResetChangePasswordServletTest {
         justification = "False positive")
     void differentUserIdWillRedirectToBadTokenPage() throws Exception {
 
-        giveAValidFormSubmission();
+        givenValidFormSubmission();
         doReturn(Optional.of(user))
             .when(tokenManager)
             .getUser(VALID_TOKEN);

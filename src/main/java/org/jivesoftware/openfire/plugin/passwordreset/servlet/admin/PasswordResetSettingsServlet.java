@@ -215,12 +215,6 @@ public class PasswordResetSettingsServlet extends HttpServlet {
             resetRequests = resetTokenManager.getResetRequests();
         }
 
-        private boolean allValid() {
-            return serverError.isEmpty() && senderNameError.isEmpty()
-                && senderAddressError.isEmpty() && subjectError.isEmpty() && bodyError.isEmpty()
-                && expiryError.isEmpty() && minLengthError.isEmpty() && maxLengthError.isEmpty();
-        }
-
         private Dto(final HttpServletRequest request) {
             this.notSupported = userProvider.isReadOnly();
             this.enabled = ParamUtils.getBooleanParameter(request, "enabled");
@@ -243,6 +237,12 @@ public class PasswordResetSettingsServlet extends HttpServlet {
             this.maxLengthError = validateMaxLength();
             this.valid = allValid();
             resetRequests = resetTokenManager.getResetRequests();
+        }
+
+        private boolean allValid() {
+            return serverError.isEmpty() && senderNameError.isEmpty()
+                && senderAddressError.isEmpty() && subjectError.isEmpty() && bodyError.isEmpty()
+                && expiryError.isEmpty() && minLengthError.isEmpty() && maxLengthError.isEmpty();
         }
 
         private String validateMaxLength() {

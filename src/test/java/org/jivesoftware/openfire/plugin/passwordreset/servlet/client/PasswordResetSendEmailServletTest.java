@@ -82,7 +82,7 @@ class PasswordResetSendEmailServletTest {
     }
 
     @Test
-    void getWillForwardWithABlankValidForm() throws Exception {
+    void getWillForwardWithBlankValidForm() throws Exception {
 
         doReturn(requestDispatcher)
             .when(request)
