@@ -97,7 +97,7 @@ dependencies {
 
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.14.2'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.15.2'
     testImplementation 'org.assertj:assertj-core:3.27.0'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
