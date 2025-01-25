@@ -10,6 +10,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.Date;
+import lombok.SneakyThrows;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.user.User;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,7 +32,7 @@ class PasswordResetTokenManagerTest {
 
     @BeforeAll
     @SuppressWarnings("deprecation")
-    static void beforeAll() throws Exception {
+    static void beforeAll() {
         Fixtures.reconfigureOpenfireHome();
         XMPPServer.setInstance(Fixtures.mockXmppServer());
     }
@@ -45,7 +46,8 @@ class PasswordResetTokenManagerTest {
             "ODR_OPEN_DATABASE_RESOURCE",
             "RV_RETURN_VALUE_IGNORED"},
         justification = "All false positives!")
-    void setUp() throws Exception {
+    @SneakyThrows
+    void setUp() {
         Fixtures.reconfigureOpenfireHome();
 
         user = new User("test-username", "Test User", "test@example.com", new Date(), new Date());
@@ -61,7 +63,8 @@ class PasswordResetTokenManagerTest {
     @SuppressFBWarnings(
         value = {"UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"},
         justification = "False positive")
-    void willGenerateRandomTokenForUser() throws Exception {
+    @SneakyThrows
+    void willGenerateRandomTokenForUser() {
         final String token1 = resetTokenManager.generateToken(user, "localhost");
         final String token2 = resetTokenManager.generateToken(user, "localhost");
 

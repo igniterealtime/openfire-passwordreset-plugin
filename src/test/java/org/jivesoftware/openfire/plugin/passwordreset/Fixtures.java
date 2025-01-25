@@ -9,6 +9,7 @@ import static org.mockito.Mockito.withSettings;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.net.URL;
+import lombok.SneakyThrows;
 import org.jivesoftware.openfire.IQRouter;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.XMPPServerInfo;
@@ -32,7 +33,8 @@ public final class Fixtures {
      * JiveGlobals#setProperty(String, String)} etc. to work (and persist) in test classes without
      * errors being displayed to stderr. Ideally should be called in a {@link BeforeAll} method.
      */
-    public static void reconfigureOpenfireHome() throws Exception {
+    @SneakyThrows
+    public static void reconfigureOpenfireHome() {
         final URL configFile = ClassLoader.getSystemResource("conf/openfire.xml");
         if (configFile == null) {
             throw new IllegalStateException(
