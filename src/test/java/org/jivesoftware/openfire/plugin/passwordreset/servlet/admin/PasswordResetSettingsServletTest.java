@@ -14,6 +14,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import lombok.SneakyThrows;
 import org.jivesoftware.admin.FlashMessageTag;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.plugin.passwordreset.Fixtures;
@@ -57,7 +58,7 @@ class PasswordResetSettingsServletTest {
 
     @BeforeAll
     @SuppressWarnings("deprecation")
-    static void beforeAll() throws Exception {
+    static void beforeAll() {
         Fixtures.reconfigureOpenfireHome();
         XMPPServer.setInstance(Fixtures.mockXmppServer());
     }
@@ -71,8 +72,9 @@ class PasswordResetSettingsServletTest {
             userProvider, () -> webManager, passwordResetMailer, tokenManager);
     }
 
+    @SneakyThrows
     @Test
-    void willForwardToJsp() throws Exception {
+    void willForwardToJsp() {
 
         final HttpServletRequest request = blankRequest();
 
@@ -82,8 +84,9 @@ class PasswordResetSettingsServletTest {
 
     }
 
+    @SneakyThrows
     @Test
-    void willSetValidForm() throws Exception {
+    void willSetValidForm() {
 
         final HttpServletRequest request = blankRequest();
 
@@ -122,7 +125,7 @@ class PasswordResetSettingsServletTest {
         doReturn("true")
             .when(request)
             .getParameter("enabled");
-        doReturn("http://example.com:7443/passwordreset")
+        doReturn("https://example.com:7443/passwordreset")
             .when(request)
             .getParameter("server");
         doReturn("Openfire")
@@ -152,8 +155,9 @@ class PasswordResetSettingsServletTest {
         return request;
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatTheServerIsPresent() throws Exception {
+    void willValidateThatTheServerIsPresent() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("").when(request).getParameter("server");
@@ -167,8 +171,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.no-server???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatTheServerIsNotTooLong() throws Exception {
+    void willValidateThatTheServerIsNotTooLong() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn(new String(new char[4001]).replace('\0', 'X'))
@@ -184,8 +189,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.server-too-long???");
     }
 
+    @SneakyThrows
     @Test
-    void willCheckTheServerIsAnHttpServer() throws Exception {
+    void willCheckTheServerIsAnHttpServer() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("ftp://example.com")
@@ -201,8 +207,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.server-no-http???");
     }
 
+    @SneakyThrows
     @Test
-    void willCheckTheSenderNameIsPresent() throws Exception {
+    void willCheckTheSenderNameIsPresent() {
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("")
             .when(request)
@@ -217,8 +224,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.no-sender-name???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatTheSenderNameIsNotTooLong() throws Exception {
+    void willValidateThatTheSenderNameIsNotTooLong() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn(new String(new char[4001]).replace('\0', 'X'))
@@ -234,8 +242,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.sender-name-too-long???");
     }
 
+    @SneakyThrows
     @Test
-    void willCheckTheSenderAddressIsPresent() throws Exception {
+    void willCheckTheSenderAddressIsPresent() {
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("")
             .when(request)
@@ -250,8 +259,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.no-sender-address???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatTheSenderAddressIsNotTooLong() throws Exception {
+    void willValidateThatTheSenderAddressIsNotTooLong() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn(new String(new char[4001]).replace('\0', 'X'))
@@ -267,8 +277,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.sender-address-too-long???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatTheSenderAddressIsAnAddress() throws Exception {
+    void willValidateThatTheSenderAddressIsAnAddress() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("this is not an email address")
@@ -284,8 +295,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.sender-address-invalid???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatTheSubjectIsPresent() throws Exception {
+    void willValidateThatTheSubjectIsPresent() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("").when(request).getParameter("subject");
@@ -299,8 +311,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.no-subject???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatTheSubjectIsNotTooLong() throws Exception {
+    void willValidateThatTheSubjectIsNotTooLong() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn(new String(new char[4001]).replace('\0', 'X'))
@@ -316,8 +329,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.subject-too-long???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatTheBodyIsPresent() throws Exception {
+    void willValidateThatTheBodyIsPresent() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("").when(request).getParameter("body");
@@ -331,8 +345,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.no-body???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatTheBodyIsNotTooLong() throws Exception {
+    void willValidateThatTheBodyIsNotTooLong() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn(new String(new char[4001]).replace('\0', 'X'))
@@ -348,8 +363,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.body-too-long???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatExpiryCountIsPresent() throws Exception {
+    void willValidateThatExpiryCountIsPresent() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("")
@@ -365,8 +381,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.expiry-count-integer???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatExpiryCountIsPositiveInteger() throws Exception {
+    void willValidateThatExpiryCountIsPositiveInteger() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("0")
@@ -383,8 +400,9 @@ class PasswordResetSettingsServletTest {
 
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatExpiryPeriodIsPresent() throws Exception {
+    void willValidateThatExpiryPeriodIsPresent() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("")
@@ -400,8 +418,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.expiry-period-invalid???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatExpiryPeriodIsValid() throws Exception {
+    void willValidateThatExpiryPeriodIsValid() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("not-a-period")
@@ -417,8 +436,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.expiry-period-invalid???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatExpiryPeriodIsSupported() throws Exception {
+    void willValidateThatExpiryPeriodIsSupported() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("YEARS")
@@ -434,8 +454,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.expiry-period-invalid???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatMinLengthIsInteger() throws Exception {
+    void willValidateThatMinLengthIsInteger() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("")
@@ -451,8 +472,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.min-length-integer???");
     }
 
+    @SneakyThrows
     @Test
-    void willValidateThatMaxLengthIsInteger() throws Exception {
+    void willValidateThatMaxLengthIsInteger() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("")
@@ -468,8 +490,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.max-length-integer???");
     }
 
+    @SneakyThrows
     @Test
-    void validateThatMaxLengthMustExceedMinLength() throws Exception {
+    void validateThatMaxLengthMustExceedMinLength() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("1")
@@ -485,8 +508,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("???passwordreset.settings.max-length-too-short???");
     }
 
+    @SneakyThrows
     @Test
-    void willRedirectWithValidFormDetails() throws Exception {
+    void willRedirectWithValidFormDetails() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
 
@@ -495,8 +519,9 @@ class PasswordResetSettingsServletTest {
         verify(response).sendRedirect(REQUEST_URI);
     }
 
+    @SneakyThrows
     @Test
-    void willUpdateWithValidFormDetails() throws Exception {
+    void willUpdateWithValidFormDetails() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
 
@@ -506,7 +531,7 @@ class PasswordResetSettingsServletTest {
         assertThat(PasswordResetPlugin.ENABLED.getValue())
             .isEqualTo(true);
         assertThat(PasswordResetPlugin.SERVER.getValue())
-            .isEqualTo("http://example.com:7443/passwordreset");
+            .isEqualTo("https://example.com:7443/passwordreset");
         assertThat(PasswordResetPlugin.SENDER_ADDRESS.getValue())
             .isEqualTo("admin@example.org");
         assertThat(PasswordResetPlugin.SUBJECT.getValue())
@@ -517,8 +542,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo(Duration.ofMinutes(42));
     }
 
+    @SneakyThrows
     @Test
-    void postWillDoNothingWithReadOnlyProvider() throws Exception {
+    void postWillDoNothingWithReadOnlyProvider() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn(true).when(userProvider).isReadOnly();
@@ -533,8 +559,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("");
     }
 
+    @SneakyThrows
     @Test
-    void cancelWillDoNothing() throws Exception {
+    void cancelWillDoNothing() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn("Cancel changes")
@@ -551,8 +578,9 @@ class PasswordResetSettingsServletTest {
             .isEqualTo("");
     }
 
+    @SneakyThrows
     @Test
-    void testWillSendTestEmail() throws Exception {
+    void testWillSendTestEmail() {
 
         final HttpServletRequest request = requestWithValidFormSubmitted();
         doReturn(null)

@@ -27,7 +27,7 @@ class PasswordResetMailerTest {
 
     @BeforeAll
     @SuppressWarnings("deprecation")
-    static void beforeAll() throws Exception {
+    static void beforeAll() {
         Fixtures.reconfigureOpenfireHome();
         XMPPServer.setInstance(Fixtures.mockXmppServer());
     }

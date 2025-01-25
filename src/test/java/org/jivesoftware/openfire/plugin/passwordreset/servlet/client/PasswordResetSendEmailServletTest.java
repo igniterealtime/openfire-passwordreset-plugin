@@ -13,6 +13,7 @@ import java.util.Date;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.plugin.passwordreset.Fixtures;
 import org.jivesoftware.openfire.plugin.passwordreset.PasswordResetMailer;
@@ -55,7 +56,7 @@ class PasswordResetSendEmailServletTest {
 
     @BeforeAll
     @SuppressWarnings("deprecation")
-    static void beforeAll() throws Exception {
+    static void beforeAll() {
         Fixtures.reconfigureOpenfireHome();
         XMPPServer.setInstance(Fixtures.mockXmppServer());
     }
@@ -81,8 +82,9 @@ class PasswordResetSendEmailServletTest {
             passwordResetMailer);
     }
 
+    @SneakyThrows
     @Test
-    void getWillForwardWithBlankValidForm() throws Exception {
+    void getWillForwardWithBlankValidForm() {
 
         doReturn(requestDispatcher)
             .when(request)
@@ -105,8 +107,9 @@ class PasswordResetSendEmailServletTest {
             .isEqualTo("");
     }
 
+    @SneakyThrows
     @Test
-    void postWithBlankUserIdWillForwardWithInvalidForm() throws Exception {
+    void postWithBlankUserIdWillForwardWithInvalidForm() {
 
         doReturn(requestDispatcher)
             .when(request)
@@ -129,8 +132,9 @@ class PasswordResetSendEmailServletTest {
             .isEqualTo("passwordreset.send-email.no-user");
     }
 
+    @SneakyThrows
     @Test
-    void postWithValidUserIdWillGenerateTokenAndSendEmail() throws Exception {
+    void postWithValidUserIdWillGenerateTokenAndSendEmail() {
 
         doReturn(REMOTE_ADDRESS)
             .when(request)
@@ -160,8 +164,9 @@ class PasswordResetSendEmailServletTest {
             .forward(request, response);
     }
 
+    @SneakyThrows
     @Test
-    void postWithValidJidWillGenerateTokenAndSendEmail() throws Exception {
+    void postWithValidJidWillGenerateTokenAndSendEmail() {
 
         doReturn(REMOTE_ADDRESS)
             .when(request)
@@ -191,8 +196,9 @@ class PasswordResetSendEmailServletTest {
             .forward(request, response);
     }
 
+    @SneakyThrows
     @Test
-    void postWithValidEmailWillGenerateTokenAndSendEmail() throws Exception {
+    void postWithValidEmailWillGenerateTokenAndSendEmail() {
 
         doReturn(REMOTE_ADDRESS)
             .when(request)
@@ -222,8 +228,9 @@ class PasswordResetSendEmailServletTest {
             .forward(request, response);
     }
 
+    @SneakyThrows
     @Test
-    void willLookInTheSecondPageOfResults() throws Exception {
+    void willLookInTheSecondPageOfResults() {
 
         doReturn(REMOTE_ADDRESS)
             .when(request)
@@ -254,8 +261,9 @@ class PasswordResetSendEmailServletTest {
             .forward(request, response);
     }
 
+    @SneakyThrows
     @Test
-    void willNotSendAnythingIfNoEmailMatches() throws Exception {
+    void willNotSendAnythingIfNoEmailMatches() {
 
         doReturn(requestDispatcher)
             .when(request)

@@ -17,6 +17,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import lombok.SneakyThrows;
 import org.jivesoftware.admin.FlashMessageTag;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.plugin.passwordreset.Fixtures;
@@ -55,7 +56,7 @@ class PasswordResetChangePasswordServletTest {
 
     @BeforeAll
     @SuppressWarnings("deprecation")
-    static void beforeAll() throws Exception {
+    static void beforeAll() {
         Fixtures.reconfigureOpenfireHome();
         XMPPServer.setInstance(Fixtures.mockXmppServer());
     }
@@ -67,8 +68,9 @@ class PasswordResetChangePasswordServletTest {
         PasswordResetChangePasswordServlet.initStatic(tokenManager);
     }
 
+    @SneakyThrows
     @Test
-    void getWithValidTokenWillShowThePasswordChangeForm() throws Exception {
+    void getWithValidTokenWillShowThePasswordChangeForm() {
 
         doReturn(requestDispatcher)
             .when(request)
@@ -87,8 +89,9 @@ class PasswordResetChangePasswordServletTest {
         verify(requestDispatcher).forward(request, response);
     }
 
+    @SneakyThrows
     @Test
-    void getWithBadTokenWillForwardToBadTokenPage() throws Exception {
+    void getWithBadTokenWillForwardToBadTokenPage() {
 
         doReturn(requestDispatcher)
             .when(request)
@@ -103,8 +106,9 @@ class PasswordResetChangePasswordServletTest {
         verify(requestDispatcher).forward(request, response);
     }
 
+    @SneakyThrows
     @Test
-    void getThatCausesSqlExceptionWillForwardToTheErrorPage() throws Exception {
+    void getThatCausesSqlExceptionWillForwardToTheErrorPage() {
 
         doReturn(requestDispatcher)
             .when(request)
@@ -119,8 +123,9 @@ class PasswordResetChangePasswordServletTest {
         verify(requestDispatcher).forward(request, response);
     }
 
+    @SneakyThrows
     @Test
-    void postWithCancelWillRedirect() throws Exception {
+    void postWithCancelWillRedirect() {
 
         doReturn("Cancel")
             .when(request)
@@ -138,8 +143,9 @@ class PasswordResetChangePasswordServletTest {
         verify(response).sendRedirect(REQUEST_URI);
     }
 
+    @SneakyThrows
     @Test
-    void postWithNothingWillRedirect() throws Exception {
+    void postWithNothingWillRedirect() {
 
         doReturn(REQUEST_URI)
             .when(request)
@@ -154,11 +160,12 @@ class PasswordResetChangePasswordServletTest {
         verify(response).sendRedirect(REQUEST_URI);
     }
 
+    @SneakyThrows
     @Test
     @SuppressFBWarnings(
         value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT",
         justification = "False positive")
-    void validFormWillUpdatePasswordAndRedirect() throws Exception {
+    void validFormWillUpdatePasswordAndRedirect() {
 
         givenValidFormSubmission();
         doReturn(session)
@@ -205,8 +212,9 @@ class PasswordResetChangePasswordServletTest {
             .getRequestDispatcher("password-reset-change-password.jsp");
     }
 
+    @SneakyThrows
     @Test
-    void newPasswordMustNotBeTooShort() throws Exception {
+    void newPasswordMustNotBeTooShort() {
 
         givenValidFormSubmission();
         doReturn("short")
@@ -220,7 +228,8 @@ class PasswordResetChangePasswordServletTest {
             .isEqualTo("???passwordreset.change-password.new-password-too-short???");
     }
 
-    Form verifyFormError() throws Exception {
+    @SneakyThrows
+    Form verifyFormError() {
         verify(user, never()).setPassword(anyString());
         verify(tokenManager, never()).deleteTokens(any());
         final ArgumentCaptor<PasswordResetChangePasswordServlet.Form> argumentCaptor
@@ -232,8 +241,9 @@ class PasswordResetChangePasswordServletTest {
         return form;
     }
 
+    @SneakyThrows
     @Test
-    void newPasswordMustNotBeTooLong() throws Exception {
+    void newPasswordMustNotBeTooLong() {
 
         givenValidFormSubmission();
         PasswordResetPlugin.MAX_LENGTH.setValue(8);
@@ -248,8 +258,9 @@ class PasswordResetChangePasswordServletTest {
             .isEqualTo("???passwordreset.change-password.new-password-too-long???");
     }
 
+    @SneakyThrows
     @Test
-    void passwordConfirmationMustMatch() throws Exception {
+    void passwordConfirmationMustMatch() {
 
         givenValidFormSubmission();
         doReturn("newPasswordIsNotSameAsConfirmationPassword")
@@ -263,8 +274,9 @@ class PasswordResetChangePasswordServletTest {
             .isEqualTo("???passwordreset.change-password.password-confirmation-no-match???");
     }
 
+    @SneakyThrows
     @Test
-    void badTokenWillRedirectToBadTokenPage() throws Exception {
+    void badTokenWillRedirectToBadTokenPage() {
 
         givenValidFormSubmission();
         doReturn(Optional.empty())
@@ -284,11 +296,12 @@ class PasswordResetChangePasswordServletTest {
 
     }
 
+    @SneakyThrows
     @Test
     @SuppressFBWarnings(
         value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT",
         justification = "False positive")
-    void differentUserIdWillRedirectToBadTokenPage() throws Exception {
+    void differentUserIdWillRedirectToBadTokenPage() {
 
         givenValidFormSubmission();
         doReturn(Optional.of(user))
