@@ -3,6 +3,7 @@ package org.jivesoftware.openfire.plugin.passwordreset.servlet.admin;
 import static java.util.Arrays.asList;
 import static org.jivesoftware.openfire.plugin.passwordreset.PasswordResetPlugin.localize;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -180,6 +181,7 @@ public class PasswordResetSettingsServlet extends HttpServlet {
         private final String maxLength;
         private final String maxLengthError;
         private final boolean valid;
+        @SuppressFBWarnings({"EI_EXPOSE_REP"})
         private final List<ResetRequest> resetRequests;
 
         private Dto() {

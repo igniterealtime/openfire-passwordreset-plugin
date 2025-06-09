@@ -3,7 +3,6 @@ package org.jivesoftware.openfire.plugin.passwordreset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Date;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.user.User;
@@ -16,9 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@SuppressFBWarnings(
-    value = "UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR",
-    justification = "False positive")
 class PasswordResetMailerTest {
 
     private PasswordResetMailer passwordResetMailer;

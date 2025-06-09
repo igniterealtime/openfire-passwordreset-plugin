@@ -5,6 +5,7 @@ import java.io.File;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
@@ -20,7 +21,6 @@ import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.SystemProperty;
 
 @Slf4j
-@SuppressFBWarnings({"EI_EXPOSE_REP", "MS_EXPOSE_REP"})
 public class PasswordResetPlugin implements Plugin {
 
     public static final String PLUGIN_NAME = "Password Reset"; // Exact match to plugin.xml
@@ -97,7 +97,10 @@ public class PasswordResetPlugin implements Plugin {
     private static String canonicalName;
     private static PasswordResetPlugin plugin;
     private final HttpBindManager httpBindManager;
+    @Getter
     private final PasswordResetMailer passwordResetMailer;
+    @Getter
+    @SuppressFBWarnings({"EI_EXPOSE_REP"})
     private final PasswordResetTokenManager resetTokenManager;
     private WebAppContext webAppContext;
 
@@ -109,6 +112,7 @@ public class PasswordResetPlugin implements Plugin {
         PasswordResetPlugin.canonicalName = canonicalName;
     }
 
+    @SuppressFBWarnings({"MS_EXPOSE_REP"})
     public static PasswordResetPlugin getInstance() {
         return plugin;
     }
@@ -174,11 +178,4 @@ public class PasswordResetPlugin implements Plugin {
         log.debug("Plugin destruction complete");
     }
 
-    public PasswordResetMailer getPasswordResetMailer() {
-        return passwordResetMailer;
-    }
-
-    public PasswordResetTokenManager getResetTokenManager() {
-        return resetTokenManager;
-    }
 }
