@@ -42,9 +42,8 @@ class PasswordResetTokenManagerTest {
         value = {
             "OBL_UNSATISFIED_OBLIGATION",
             "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING",
-            "UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR",
             "ODR_OPEN_DATABASE_RESOURCE",
-            "RV_RETURN_VALUE_IGNORED"},
+        },
         justification = "All false positives!")
     @SneakyThrows
     void setUp() {
@@ -60,9 +59,6 @@ class PasswordResetTokenManagerTest {
     }
 
     @Test
-    @SuppressFBWarnings(
-        value = {"UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"},
-        justification = "False positive")
     @SneakyThrows
     void willGenerateRandomTokenForUser() {
         final String token1 = resetTokenManager.generateToken(user, "localhost");
