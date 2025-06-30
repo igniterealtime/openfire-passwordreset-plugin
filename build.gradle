@@ -95,7 +95,7 @@ dependencies {
 
     testCompileOnly lombok
 
-    testImplementation platform('org.junit:junit-bom:5.13.1')
+    testImplementation platform('org.junit:junit-bom:5.13.2')
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.18.0'
     testImplementation 'org.assertj:assertj-core:3.27.3'
