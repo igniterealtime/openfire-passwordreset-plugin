@@ -7,7 +7,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'checkstyle'
-    id 'com.github.spotbugs' version '6.2.3'
+    id 'com.github.spotbugs' version '6.2.4'
     id 'com.github.ben-manes.versions' version '0.52.0'
 }
 
@@ -97,7 +97,7 @@ dependencies {
 
     testImplementation platform('org.junit:junit-bom:5.13.4')
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.18.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.19.0'
     testImplementation 'org.assertj:assertj-core:3.27.4'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

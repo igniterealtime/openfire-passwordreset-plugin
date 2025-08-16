@@ -10,7 +10,6 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.SQLException;
 import java.util.Optional;
 import javax.servlet.RequestDispatcher;
@@ -162,9 +161,6 @@ class PasswordResetChangePasswordServletTest {
 
     @SneakyThrows
     @Test
-    @SuppressFBWarnings(
-        value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT",
-        justification = "False positive")
     void validFormWillUpdatePasswordAndRedirect() {
 
         givenValidFormSubmission();
@@ -298,9 +294,6 @@ class PasswordResetChangePasswordServletTest {
 
     @SneakyThrows
     @Test
-    @SuppressFBWarnings(
-        value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT",
-        justification = "False positive")
     void differentUserIdWillRedirectToBadTokenPage() {
 
         givenValidFormSubmission();
