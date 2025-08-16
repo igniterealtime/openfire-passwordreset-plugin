@@ -6,7 +6,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.net.URL;
 import lombok.SneakyThrows;
@@ -72,9 +71,6 @@ public final class Fixtures {
      *
      * @return a mock XMPPServer
      */
-    @SuppressFBWarnings(
-        value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT",
-        justification = "False positive")
     public static XMPPServer mockXmppServer() {
         final XMPPServer xmppServer = mock(
             XMPPServer.class,
