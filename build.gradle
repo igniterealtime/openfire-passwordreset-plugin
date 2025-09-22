@@ -82,7 +82,7 @@ spotbugsMain {
 
 dependencies {
 
-    def lombok = 'org.projectlombok:lombok:1.18.40'
+    def lombok = 'org.projectlombok:lombok:1.18.42'
 
     annotationProcessor lombok
 
