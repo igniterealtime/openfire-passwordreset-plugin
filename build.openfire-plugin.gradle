@@ -20,7 +20,7 @@ configurations {
 dependencies {
     compileOnly "org.igniterealtime.openfire:xmppserver:${minOpenfireVersion}"
     testImplementation "org.igniterealtime.openfire:xmppserver:${minOpenfireVersion}"
-    jspc 'org.apache.ant:ant:1.10.15'
+    jspc 'org.apache.ant:ant:1.10.17'
 }
 
 def canonicalName = project.name.replaceAll('\\W', '').toLowerCase()
