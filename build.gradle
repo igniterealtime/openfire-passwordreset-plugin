@@ -7,8 +7,8 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'checkstyle'
-    id 'com.github.spotbugs' version '6.5.9'
-    id 'com.github.ben-manes.versions' version '0.61.0'
+    id 'com.github.spotbugs' version '6.5.10'
+    id 'io.github.ben-manes.versions' version '0.61.0'
 }
 
 ext {
@@ -35,7 +35,6 @@ test {
 }
 
 checkstyle {
-    toolVersion = '10.21.1'
     maxWarnings = 0
 }
 
@@ -87,15 +86,14 @@ dependencies {
     annotationProcessor lombok
 
     compileOnly lombok
+    compileOnly 'com.github.spotbugs:spotbugs-annotations:4.10.3'
 
-    implementation('com.github.spotbugs:spotbugs-annotations:4.10.3') {
-        exclude group: 'org.junit', module: 'junit-bom'
-    }
     implementation 'com.github.bbottema:emailaddress-rfc2822:2.3.1'
 
     testAnnotationProcessor lombok
 
     testCompileOnly lombok
+    testCompileOnly 'com.github.spotbugs:spotbugs-annotations:4.10.3'
 
     testImplementation platform('org.junit:junit-bom:5.14.4')
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
@@ -105,8 +103,6 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
-
-dependencyUpdates.gradleReleaseChannel="current"
 
 // See https://github.com/jeremylong/DependencyCheck/issues/2764#issuecomment-680680558 for an explanation
 dependencies {
@@ -118,5 +114,22 @@ dependencies {
 class ClearDependencies implements ComponentMetadataRule {
     void execute(ComponentMetadataContext context) {
         context.details.allVariants { withDependencies { clear() } }
+    }
+}
+
+def isNonStable = { String version ->
+    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+    def regex = /^[0-9,.v-]+(-r|-jre|-android)?$/
+    return !stableKeyword && !(version ==~ regex)
+}
+
+def notJava11 = { selection ->
+    return selection.group.startsWith("org.junit") && selection.version.startsWith("6.")
+}
+
+tasks.named("dependencyUpdates") {
+    gradleReleaseChannel = "current"
+    rejectVersionIf {
+        isNonStable(candidate.version) || notJava11(candidate)
     }
 }
