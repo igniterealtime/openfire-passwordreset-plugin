@@ -8,7 +8,7 @@ plugins {
     id 'maven-publish'
     id 'checkstyle'
     id 'com.github.spotbugs' version '6.5.12'
-    id 'io.github.ben-manes.versions' version '0.64.0'
+    id 'io.github.ben-manes.versions' version '0.65.0'
 }
 
 ext {
