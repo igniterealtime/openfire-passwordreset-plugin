@@ -7,8 +7,8 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'checkstyle'
-    id 'com.github.spotbugs' version '6.5.12'
-    id 'io.github.ben-manes.versions' version '0.64.0'
+    id 'com.github.spotbugs' version '6.5.13'
+    id 'io.github.ben-manes.versions' version '0.66.0'
 }
 
 ext {
@@ -48,29 +48,33 @@ tasks.withType(Checkstyle).configureEach {
 
 spotbugs {
     effort = Effort.MAX
-    reportLevel = Confidence.values()[0] // LOW - See also https://github.com/spotbugs/spotbugs-gradle-plugin/issues/972
-    ignoreFailures.set false
-    extraArgs.add "-longBugCodes"
+    //noinspection GroovyAssignabilityCheck
+    reportLevel = Confidence.valueOf('LOW')
+    ignoreFailures = false
+    extraArgs.add '-longBugCodes'
 }
 
-//noinspection ConfigurationAvoidance - as this registers a new task, we can't use .forEach
-tasks.withType(SpotBugsTask) {
+//noinspection GroovyAssignabilityCheck
+tasks.withType(SpotBugsTask).configureEach {
+    //noinspection GroovyAssignabilityCheck
     reports(({
         text.enabled = true
         xml.enabled = false
     } as Closure<NamedDomainObjectContainer<? extends SpotBugsReport>>))
+}
 
-    //noinspection GroovyAssignabilityCheck
-    tasks.register("${it.name}Report") {
-        def input = reports.named("text").get().outputLocation.asFile.get()
-        inputs.file input
-        doLast {
-            input.readLines().forEach {
-                println(it)
+afterEvaluate {
+    tasks.matching { it instanceof SpotBugsTask }.each { spotbugsTask ->
+        def reportTaskName = "${spotbugsTask.name}Report"
+        tasks.register(reportTaskName) {
+            def input = (spotbugsTask as SpotBugsTask).reports.named("text").get().outputLocation.asFile.get()
+            inputs.file input
+            doLast {
+                input.readLines().forEach { String line -> println(line) }
             }
         }
+        spotbugsTask.finalizedBy reportTaskName
     }
-    it.finalizedBy "${it.name}Report"
 }
 
 spotbugsMain {
@@ -86,7 +90,7 @@ dependencies {
     annotationProcessor lombok
 
     compileOnly lombok
-    compileOnly 'com.github.spotbugs:spotbugs-annotations:4.10.4'
+    compileOnly "com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}"
 
     implementation 'com.github.bbottema:emailaddress-rfc2822:2.3.1'
 
