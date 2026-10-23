@@ -20,7 +20,7 @@ configurations {
 dependencies {
     compileOnly "org.igniterealtime.openfire:xmppserver:${minOpenfireVersion}"
     testImplementation "org.igniterealtime.openfire:xmppserver:${minOpenfireVersion}"
-    jspc 'org.apache.ant:ant:1.10.17'
+    jspc 'org.apache.ant:ant:1.10.18'
 }
 
 def canonicalName = project.name.replaceAll('\\W', '').toLowerCase()
@@ -248,14 +248,20 @@ tasks.register('deploy') {
 
 publishing {
     publications {
+        //noinspection GroovyAssignabilityCheck
         plugin(MavenPublication) {
+            //noinspection GroovyAssignabilityCheck
             from components.java
+            //noinspection GroovyAssignabilityCheck
             artifact openfirePluginAssembly
             pom {
+                //noinspection GroovyAssignabilityCheck
                 groupId = 'org.igniterealtime.openfire.plugins'
+                //noinspection GroovyAssignabilityCheck
                 artifactId = canonicalName
                 name = pluginName
                 description = pluginDescription
+                //noinspection GroovyAssignabilityCheck
                 url = 'https://igniterealtime.org/projects/openfire/plugin-archive.jsp?plugin=' + project.name
             }
         }
