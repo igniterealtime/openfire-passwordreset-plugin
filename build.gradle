@@ -86,18 +86,19 @@ spotbugsMain {
 dependencies {
 
     def lombok = 'org.projectlombok:lombok:1.18.48'
+    def spotbugsAnnotations = "com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}"
 
     annotationProcessor lombok
 
     compileOnly lombok
-    compileOnly "com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}"
+    compileOnly spotbugsAnnotations
 
     implementation 'com.github.bbottema:emailaddress-rfc2822:2.3.1'
 
     testAnnotationProcessor lombok
 
     testCompileOnly lombok
-    testCompileOnly 'com.github.spotbugs:spotbugs-annotations:4.10.4'
+    testCompileOnly spotbugsAnnotations
 
     testImplementation platform('org.junit:junit-bom:5.14.4')
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
@@ -108,7 +109,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
-// See https://github.com/jeremylong/DependencyCheck/issues/2764#issuecomment-680680558 for an explanation
+// See https://github.com/dependency-check/DependencyCheck/issues/2764#issuecomment-680680558 for an explanation
 dependencies {
     components {
         withModule('org.dom4j:dom4j', ClearDependencies)
