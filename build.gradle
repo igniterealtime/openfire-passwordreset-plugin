@@ -97,7 +97,7 @@ dependencies {
     testAnnotationProcessor lombok
 
     testCompileOnly lombok
-    testCompileOnly 'com.github.spotbugs:spotbugs-annotations:4.10.4'
+    testCompileOnly 'com.github.spotbugs:spotbugs-annotations:4.10.5'
 
     testImplementation platform('org.junit:junit-bom:5.14.4')
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
